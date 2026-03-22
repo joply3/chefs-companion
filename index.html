@@ -973,6 +973,136 @@ html, body {
   background:none; border:none; color:rgba(255,255,255,0.35);
   font-size:1.1rem; cursor:pointer; padding:4px; flex-shrink:0;
 }
+
+/* ══════════════════════════════════════════════
+   EDIT MODAL
+══════════════════════════════════════════════ */
+#editModal {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: var(--linen); flex-direction: column; overflow: hidden;
+}
+#editModal.on { display: flex; }
+
+.edit-topbar {
+  background: var(--forest); height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; flex-shrink: 0;
+}
+.edit-topbar-title {
+  font-family: 'Lato', sans-serif; font-size: 1rem;
+  font-weight: 700; color: #fff;
+}
+.btn-edit-cancel {
+  background: rgba(255,255,255,0.12); border: none;
+  border-radius: 7px; padding: 7px 13px;
+  font-family: 'Lato', sans-serif; font-size: 0.75rem;
+  font-weight: 600; color: rgba(255,255,255,0.8);
+  cursor: pointer;
+}
+.btn-edit-done {
+  background: #fff; border: none;
+  border-radius: 7px; padding: 7px 14px;
+  font-family: 'Lato', sans-serif; font-size: 0.75rem;
+  font-weight: 700; color: var(--forest);
+  cursor: pointer;
+}
+.btn-edit-done:active { background: var(--linen-d); }
+
+.edit-scroll {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 16px 16px 40px;
+}
+
+.edit-field-label {
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-45);
+  margin-bottom: 6px; display: block;
+}
+.edit-input {
+  width: 100%; background: var(--white);
+  border: 1.5px solid var(--ink-20); border-radius: 9px;
+  padding: 11px 13px; font-family: 'Lato', sans-serif;
+  font-size: 0.95rem; color: var(--ink); outline: none;
+  transition: border-color 0.15s; margin-bottom: 14px;
+}
+.edit-input:focus { border-color: var(--forest); }
+
+.edit-section-title {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-45);
+  margin: 18px 0 10px; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.btn-add-row {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--forest-l); border: 1.5px solid rgba(27,58,43,0.2);
+  border-radius: 7px; padding: 5px 11px;
+  font-family: 'Lato', sans-serif; font-size: 0.68rem;
+  font-weight: 700; color: var(--forest); cursor: pointer;
+}
+.btn-add-row:active { background: rgba(27,58,43,0.15); }
+
+.edit-ing-row {
+  background: var(--white); border-radius: 10px;
+  border: 1.5px solid var(--ink-08); padding: 10px 12px;
+  margin-bottom: 8px; position: relative;
+  box-shadow: var(--sh);
+}
+.edit-ing-fields {
+  display: grid; grid-template-columns: 80px 1fr;
+  gap: 8px; margin-bottom: 6px;
+}
+.edit-ing-input {
+  width: 100%; background: var(--linen);
+  border: 1.5px solid var(--ink-08); border-radius: 7px;
+  padding: 8px 10px; font-family: 'Lato', sans-serif;
+  font-size: 0.82rem; color: var(--ink); outline: none;
+  transition: border-color 0.15s;
+}
+.edit-ing-input:focus { border-color: var(--forest); background: var(--white); }
+.edit-ing-input.grams { text-align: right; font-weight: 700; color: var(--forest); }
+.edit-ing-row2 {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.edit-ing-meta {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-45);
+  margin-bottom: 3px;
+}
+.btn-del-ing {
+  position: absolute; top: 8px; right: 8px;
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-45); font-size: 0.9rem; padding: 3px 5px;
+  border-radius: 5px; transition: color 0.1s, background 0.1s;
+}
+.btn-del-ing:active { color: var(--red); background: rgba(217,79,56,0.1); }
+
+.edit-step-row {
+  display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start;
+}
+.edit-step-num {
+  font-family: 'Lato', sans-serif; font-size: 0.85rem;
+  font-weight: 700; color: var(--forest); min-width: 22px;
+  padding-top: 10px; opacity: 0.5;
+}
+.edit-step-ta {
+  flex: 1; background: var(--white);
+  border: 1.5px solid var(--ink-08); border-radius: 9px;
+  padding: 9px 11px; font-family: 'Lato', sans-serif;
+  font-size: 0.85rem; color: var(--ink); outline: none;
+  resize: none; line-height: 1.5; transition: border-color 0.15s;
+  min-height: 60px;
+}
+.edit-step-ta:focus { border-color: var(--forest); }
+.btn-del-step {
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-45); font-size: 0.9rem; padding: 6px 4px;
+  border-radius: 5px; transition: color 0.1s;
+  margin-top: 4px;
+}
+.btn-del-step:active { color: var(--red); }
+
 </style>
 </head>
 <body>
@@ -1223,6 +1353,13 @@ html, body {
           </svg>
           Save
         </button>
+        <button class="btn" onclick="openEdit()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </button>
         <button class="btn primary" onclick="goScan()">+ New</button>
       </div>
 
@@ -1287,6 +1424,18 @@ html, body {
       <span class="nav-lbl">Saved</span>
     </button>
   </div>
+
+
+<!-- ── EDIT RECIPE MODAL ── -->
+<div id="editModal">
+  <div id="safeTopEdit" style="height:var(--safe-top);background:var(--forest);flex-shrink:0"></div>
+  <div class="edit-topbar">
+    <button class="btn-edit-cancel" onclick="closeEdit()">Cancel</button>
+    <span class="edit-topbar-title">Edit Recipe</span>
+    <button class="btn-edit-done" onclick="saveEdit()">Done ✓</button>
+  </div>
+  <div class="edit-scroll" id="editScroll"></div>
+</div>
 
 </div><!-- /app -->
 
@@ -1828,7 +1977,180 @@ function convertNow() {
   runScan();
 }
 
-// ── API Key management ──
+// ── Edit Recipe ──
+function openEdit() {
+  if(!recipe) return;
+  renderEditModal();
+  document.getElementById('editModal').classList.add('on');
+  document.getElementById('editScroll').scrollTop = 0;
+}
+
+function closeEdit() {
+  document.getElementById('editModal').classList.remove('on');
+}
+
+function saveEdit() {
+  // Read title & servings
+  const titleEl = document.getElementById('editTitle');
+  const servingsEl = document.getElementById('editServings');
+  if(titleEl) recipe.title = titleEl.value.trim() || recipe.title;
+  if(servingsEl) recipe.servings = servingsEl.value.trim();
+
+  // Read ingredients
+  const ingRows = document.querySelectorAll('.edit-ing-row');
+  const newIngs = [];
+  ingRows.forEach(row => {
+    const nameEl = row.querySelector('.edit-ing-name');
+    const gramsEl = row.querySelector('.edit-ing-grams');
+    const origEl = row.querySelector('.edit-ing-orig');
+    const noteEl = row.querySelector('.edit-ing-note');
+    const name = nameEl?.value?.trim();
+    if(!name) return; // skip blank rows
+    const grams = parseFloat(gramsEl?.value) || 0;
+    newIngs.push({
+      name,
+      grams,
+      originalQty: origEl?.value?.trim() || '',
+      note: noteEl?.value?.trim() || '',
+      isCount: row.dataset.iscount === 'true',
+      sources: ['edited'],
+      sourceValues: [grams]
+    });
+  });
+  if(newIngs.length > 0) recipe.ingredients = newIngs;
+
+  // Read instructions
+  const stepTas = document.querySelectorAll('.edit-step-ta');
+  const newSteps = [];
+  stepTas.forEach(ta => { const v = ta.value.trim(); if(v) newSteps.push(v); });
+  recipe.instructions = newSteps;
+
+  closeEdit();
+  renderRecipe();
+
+  // If recipe is already saved, update it in saved list
+  const idx = saved.findIndex(r => r.title === recipe.title || r._savedId === recipe._savedId);
+  if(idx !== -1) {
+    saved[idx] = {...recipe};
+    localStorage.setItem('cc_saved', JSON.stringify(saved));
+    showToast('✓ Recipe updated');
+  } else {
+    showToast('✓ Changes saved');
+  }
+}
+
+function renderEditModal() {
+  const scroll = document.getElementById('editScroll');
+  const ings = recipe.ingredients || [];
+  const steps = recipe.instructions || [];
+
+  scroll.innerHTML = `
+    <label class="edit-field-label">Recipe Name</label>
+    <input class="edit-input" id="editTitle" value="${escHtml(recipe.title||'')}" placeholder="Recipe name">
+
+    <label class="edit-field-label">Servings</label>
+    <input class="edit-input" id="editServings" value="${escHtml(recipe.servings||'')}" placeholder="e.g. serves 4">
+
+    <div class="edit-section-title">
+      Ingredients
+      <button class="btn-add-row" onclick="addEditIngredient()">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add
+      </button>
+    </div>
+    <div id="editIngList">
+      ${ings.map((ing, i) => buildEditIngRow(ing, i)).join('')}
+    </div>
+
+    <div class="edit-section-title">
+      Method
+      <button class="btn-add-row" onclick="addEditStep()">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Step
+      </button>
+    </div>
+    <div id="editStepList">
+      ${steps.map((step, i) => buildEditStepRow(step, i)).join('')}
+    </div>
+  `;
+}
+
+function buildEditIngRow(ing, i) {
+  const g = ing.isCount ? ing.grams : (ing.grams || 0);
+  return `<div class="edit-ing-row" data-iscount="${ing.isCount||false}">
+    <button class="btn-del-ing" onclick="delEditIng(this)" title="Remove">✕</button>
+    <div class="edit-ing-fields">
+      <div>
+        <div class="edit-ing-meta">${ing.isCount ? 'Count' : 'Grams'}</div>
+        <input class="edit-ing-input grams edit-ing-grams" type="number" value="${g}" min="0" step="0.5" placeholder="0">
+      </div>
+      <div>
+        <div class="edit-ing-meta">Ingredient</div>
+        <input class="edit-ing-input edit-ing-name" type="text" value="${escHtml(ing.name||'')}" placeholder="e.g. plain flour">
+      </div>
+    </div>
+    <div class="edit-ing-row2">
+      <div>
+        <div class="edit-ing-meta">Original Qty</div>
+        <input class="edit-ing-input edit-ing-orig" type="text" value="${escHtml(ing.originalQty||'')}" placeholder="e.g. 2 cups">
+      </div>
+      <div>
+        <div class="edit-ing-meta">Note</div>
+        <input class="edit-ing-input edit-ing-note" type="text" value="${escHtml(ing.note||'')}" placeholder="e.g. sifted">
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildEditStepRow(step, i) {
+  return `<div class="edit-step-row">
+    <div class="edit-step-num">${String(i+1).padStart(2,'0')}</div>
+    <textarea class="edit-step-ta" placeholder="Describe this step…">${escHtml(step)}</textarea>
+    <button class="btn-del-step" onclick="delEditStep(this)" title="Remove">✕</button>
+  </div>`;
+}
+
+function addEditIngredient() {
+  const list = document.getElementById('editIngList');
+  const i = list.querySelectorAll('.edit-ing-row').length;
+  const div = document.createElement('div');
+  div.innerHTML = buildEditIngRow({name:'',grams:0,originalQty:'',note:'',isCount:false}, i);
+  list.appendChild(div.firstElementChild);
+  list.lastElementChild.querySelector('.edit-ing-name').focus();
+  renumberEditSteps();
+}
+
+function addEditStep() {
+  const list = document.getElementById('editStepList');
+  const i = list.querySelectorAll('.edit-step-ta').length;
+  const div = document.createElement('div');
+  div.innerHTML = buildEditStepRow('', i);
+  list.appendChild(div.firstElementChild);
+  renumberEditSteps();
+  list.lastElementChild.querySelector('.edit-step-ta').focus();
+}
+
+function delEditIng(btn) {
+  btn.closest('.edit-ing-row').remove();
+}
+
+function delEditStep(btn) {
+  btn.closest('.edit-step-row').remove();
+  renumberEditSteps();
+}
+
+function renumberEditSteps() {
+  document.querySelectorAll('#editStepList .edit-step-row').forEach((row, i) => {
+    const num = row.querySelector('.edit-step-num');
+    if(num) num.textContent = String(i+1).padStart(2,'0');
+  });
+}
+
+
 let apiKey = localStorage.getItem('cc_apikey') || '';
 
 function checkApiKey() {
@@ -1969,13 +2291,7 @@ async function runScan(){
   },1500);
 
   try{
-    const dbCtx=Object.entries(cfg.db).map(([k,v])=>{
-      const s=cfg.srcKeys.filter(x=>v[x]!=null);
-      return `${k}: ${Math.round(s.reduce((a,x)=>a+v[x],0)/s.length)}g per ${v._unit||'cup'}`;
-    }).join('\n');
-
-    // Build messages in OpenAI format (OpenRouter is OpenAI-compatible)
-    const sysPrompt = buildSys(dbCtx);
+    // Build user message (includes system instructions inline for free model compatibility)
     const userContent = buildContent();
 
     // openrouter/free auto-selects the best available free model,
@@ -1997,10 +2313,9 @@ async function runScan(){
           },
           body:JSON.stringify({
             model,
-            max_tokens: 1500,
+            max_tokens: 2000,
             messages:[
-              {role:"system", content: sysPrompt},
-              {role:"user",   content: userContent}
+              {role:"user", content: userContent}
             ]
           })
         });
@@ -2066,36 +2381,40 @@ async function runScan(){
 
 function buildSys(db){
   const cfg = REGION_CONFIG[region];
-  const r = region === 'AUS'
-    ? `Australian recipe assistant. AUS: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml, 1 tsp=${cfg.tsp}ml.`
-    : `American recipe assistant. US: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml, 1 tsp=${cfg.tsp}ml.`;
-  const srcList = cfg.srcDefaultLabels.join(', ');
-  const exampleSources = JSON.stringify(cfg.srcKeys);
-  const exampleSrcVals = cfg.srcKeys.map(()=>150).join(',');
-  return `You are Chef's Companion, ${r}
-Use this conversion DATABASE (${cfg.name} sources: ${srcList}) for gram values:
-${db}
-For any ingredient NOT in the database, use your best knowledge of ${cfg.name} gram equivalents.
-Whole items like eggs, garlic cloves, bay leaves → isCount:true, set grams to the count number.
-Return ONLY a valid JSON object with NO markdown fences, NO explanation:
-{"title":"Name","servings":"serves 4","ingredients":[{"name":"plain flour","grams":300,"originalQty":"2 cups","note":"sifted","sources":${exampleSources},"sourceValues":[${exampleSrcVals}],"isCount":false}],"instructions":["Step 1"],"sourcesUsed":${JSON.stringify(cfg.srcDefaultLabels)}}`;
+  const cup = cfg.cup, tbsp = cfg.tbsp;
+  return `You are a recipe conversion assistant. Extract ALL ingredients and instructions from the recipe. Convert every quantity to grams using these ${region} conversions (1 cup=${cup}ml, 1 tbsp=${tbsp}ml, 1 tsp=5ml).
+
+Common gram references: ${db}
+
+Rules:
+- For whole items (eggs, cloves, leaves) set isCount:true and grams = the number
+- Use your knowledge for any ingredient not listed above
+- Return ONLY raw JSON, no markdown, no explanation, no extra text
+
+JSON format:
+{"title":"Recipe Name","servings":"serves 4","ingredients":[{"name":"plain flour","grams":300,"originalQty":"2 cups","note":"","isCount":false,"sources":["db"],"sourceValues":[300]}],"instructions":["Step 1","Step 2"],"sourcesUsed":["${cfg.srcDefaultLabels[0]}","${cfg.srcDefaultLabels[1]}"]}`;
 }
 
 function buildContent(){
   const cfg = REGION_CONFIG[region];
-  const text=document.getElementById('recipeText').value.trim();
-  const hint = `${region}: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml`;
-  // OpenRouter / OpenAI vision format
+  const text = document.getElementById('recipeText').value.trim();
+  const hint = `${region} measurements: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml`;
+  const sys = buildSys(Object.entries(cfg.db).slice(0,30).map(([k,v])=>{
+    const s=cfg.srcKeys.filter(x=>v[x]!=null);
+    return k+':'+ Math.round(s.reduce((a,x)=>a+v[x],0)/s.length)+'g/'+(v._unit||'cup');
+  }).join(', '));
+
   if(photoB64){
     const imgUrl = `data:${photoMime};base64,${photoB64}`;
+    const instruction = text
+      ? `${sys}\n\nExtract this recipe image and convert to grams (${hint}). Extra context: ${text}`
+      : `${sys}\n\nExtract all ingredients and instructions from this recipe image and convert to grams (${hint}).`;
     return [
-      {type:"image_url", image_url:{url: imgUrl}},
-      {type:"text", text: text
-        ? `Extract this recipe image. Extra context: ${text}. Convert all quantities to grams (${hint}).`
-        : `Extract all ingredients and instructions from this recipe image. Convert quantities to grams (${hint}).`}
+      {type:"text", text: instruction},
+      {type:"image_url", image_url:{url: imgUrl}}
     ];
   }
-  return `Extract all ingredients and instructions from this recipe, converting all quantities to grams (${hint}):\n\n${text}`;
+  return `${sys}\n\nExtract and convert this recipe to grams (${hint}):\n\n${text}`;
 }
 
 // ── Render Recipe ──
