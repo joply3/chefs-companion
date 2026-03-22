@@ -1829,7 +1829,7 @@ async function runScan(){
         "X-Title": "Chef's Companion"
       },
       body:JSON.stringify({
-        model: "google/gemma-3-27b-it:free",
+        model: "openrouter/auto",
         max_tokens: 1500,
         messages:[
           {role:"system", content: sysPrompt},
@@ -1840,8 +1840,11 @@ async function runScan(){
     clearInterval(loadInterval);
     const data=await res.json();
 
-    // OpenRouter error handling
-    if(data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    // OpenRouter error handling — show full error for debugging
+    if(!res.ok || data.error){
+      const errMsg = data.error?.message || data.error?.code || JSON.stringify(data.error) || `HTTP ${res.status}`;
+      throw new Error(errMsg);
+    }
 
     // OpenAI-format response: choices[0].message.content
     const raw = data.choices?.[0]?.message?.content || '';
