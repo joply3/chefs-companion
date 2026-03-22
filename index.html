@@ -750,6 +750,64 @@ html, body {
   width: 100%;
 }
 
+/* ── Saved screen search bar ── */
+.saved-search-wrap {
+  position: relative; margin-bottom: 14px;
+}
+.saved-search {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--ink-20);
+  border-radius: 12px;
+  padding: 12px 40px 12px 40px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem; color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: var(--sh);
+  -webkit-appearance: none;
+}
+.saved-search:focus {
+  border-color: var(--forest);
+  box-shadow: var(--sh), 0 0 0 3px rgba(27,58,43,0.08);
+}
+.saved-search::placeholder { color: var(--ink-45); }
+.saved-search-icon {
+  position: absolute; left: 13px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-45); pointer-events: none;
+}
+.saved-search-clear {
+  position: absolute; right: 11px; top: 50%;
+  transform: translateY(-50%);
+  background: var(--linen-d); border: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+  color: var(--ink-45); cursor: pointer; font-size: 0.7rem;
+}
+.saved-search-clear.show { display: flex; }
+.saved-search-clear:active { background: var(--ink-20); }
+.saved-no-results {
+  text-align: center; padding: 40px 20px;
+  color: var(--ink-45); font-size: 0.82rem; font-style: italic;
+}
+.saved-header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.saved-header-title {
+  font-family: 'Lato', sans-serif;
+  font-size: 1.1rem; font-weight: 900;
+  color: var(--ink); letter-spacing: -0.01em;
+}
+.saved-count-chip {
+  background: var(--forest-l);
+  border: 1px solid rgba(27,58,43,0.15);
+  border-radius: 10px; padding: 3px 10px;
+  font-size: 0.65rem; font-weight: 700;
+  color: var(--forest);
+}
+
 /* ══════════════════════════════════════════════
    TOAST
 ══════════════════════════════════════════════ */
@@ -767,8 +825,107 @@ html, body {
 #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ══════════════════════════════════════════════
-   INSTALL BANNER
+   API KEY SETUP SCREEN
 ══════════════════════════════════════════════ */
+#apiSetup {
+  display: none;
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--forest);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 32px 24px;
+  text-align: center;
+}
+#apiSetup.on { display: flex; }
+
+.api-logo {
+  width: 72px; height: 72px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; margin-bottom: 24px;
+}
+.api-title {
+  font-family: 'Lato', sans-serif;
+  font-size: 1.5rem; font-weight: 900;
+  color: #fff; margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.api-sub {
+  font-size: 0.82rem; color: rgba(255,255,255,0.55);
+  line-height: 1.6; margin-bottom: 32px;
+  max-width: 300px;
+}
+.api-card {
+  background: var(--white);
+  border-radius: var(--r);
+  padding: 20px;
+  width: 100%; max-width: 380px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.api-card-label {
+  font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-45); margin-bottom: 10px;
+  text-align: left;
+}
+.api-input-wrap {
+  position: relative;
+  display: flex; align-items: center;
+  margin-bottom: 12px;
+}
+.api-input {
+  width: 100%; border: 1.5px solid var(--ink-20);
+  border-radius: var(--r-s); padding: 13px 44px 13px 14px;
+  font-family: 'Lato', sans-serif; font-size: 0.85rem;
+  color: var(--ink); background: var(--linen);
+  outline: none; transition: border-color 0.15s;
+  letter-spacing: 0.04em;
+}
+.api-input:focus { border-color: var(--forest); background: var(--white); }
+.api-input::placeholder { color: var(--ink-45); letter-spacing: 0; }
+.api-eye {
+  position: absolute; right: 12px;
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-45); padding: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-api-save {
+  width: 100%; background: var(--forest); color: #fff;
+  border: none; border-radius: var(--r-s);
+  padding: 14px; font-family: 'Lato', sans-serif;
+  font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; transition: background 0.15s;
+  box-shadow: 0 3px 12px rgba(27,58,43,0.3);
+}
+.btn-api-save:active { background: var(--forest-m); }
+.btn-api-save:disabled { background: var(--ink-20); box-shadow: none; }
+.api-hint {
+  font-size: 0.7rem; color: rgba(255,255,255,0.4);
+  line-height: 1.6; max-width: 300px;
+}
+.api-hint a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: underline;
+}
+.api-err {
+  font-size: 0.72rem; color: #FF8A75;
+  margin-top: 8px; display: none; text-align: left;
+}
+.api-err.on { display: block; }
+
+/* Settings gear in top bar */
+.btn-settings {
+  background: rgba(255,255,255,0.1);
+  border: none; border-radius: 7px;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.65); cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-settings:active { background: rgba(255,255,255,0.2); }
+
 #installBanner {
   display: none; position: fixed;
   bottom: calc(var(--nav-h) + var(--safe-bot) + 12px);
@@ -817,6 +974,12 @@ html, body {
           <span class="flag">🇺🇸</span> US
         </button>
       </div>
+      <button class="btn-settings" onclick="openSettings()" title="API Key Settings">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
     </div>
   </div>
 
@@ -824,7 +987,7 @@ html, body {
   <div id="content">
 
     <!-- ── SCAN SCREEN ── -->
-    <div class="screen active" id="scanScreen">
+    <div class="screen" id="scanScreen">
 
       <div class="cam-hero" id="camHero">
         <input type="file" id="fileInput" accept="image/*">
@@ -1013,6 +1176,20 @@ html, body {
 
     <!-- ── SAVED SCREEN ── -->
     <div class="screen" id="savedScreen">
+      <div class="saved-header-row">
+        <div class="saved-header-title">My Recipes</div>
+        <div class="saved-count-chip" id="savedCountChip">0 recipes</div>
+      </div>
+      <div class="saved-search-wrap">
+        <svg class="saved-search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input class="saved-search" id="savedSearch" type="search"
+          placeholder="Search recipes, ingredients, notes…"
+          oninput="filterSaved(this.value)"
+          autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="saved-search-clear" id="searchClearBtn" onclick="clearSearch()">✕</button>
+      </div>
       <div id="savedContent"></div>
     </div>
 
@@ -1020,7 +1197,7 @@ html, body {
 
   <!-- Bottom Nav -->
   <div id="bottomNav">
-    <button class="nav-tab active" id="navScan" onclick="showScreen('scan')">
+    <button class="nav-tab" id="navScan" onclick="showScreen('scan')">
       <div class="nav-icon-wrap">
         <div class="nav-icon">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1070,6 +1247,38 @@ html, body {
   <div class="ld-chips" id="ldChips"></div>
 </div>
 
+<!-- API Key Setup Screen -->
+<div id="apiSetup">
+  <div class="api-logo">
+    <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  </div>
+  <div class="api-title">Chef's Companion</div>
+  <div class="api-sub">Enter your Anthropic API key to power the recipe scanner. Your key is saved only on your device.</div>
+
+  <div class="api-card">
+    <div class="api-card-label">Anthropic API Key</div>
+    <div class="api-input-wrap">
+      <input class="api-input" type="password" id="apiKeyInput"
+        placeholder="sk-or-v1-..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="api-eye" id="apiEye" onclick="toggleApiVis()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+    <div class="api-err" id="apiErr"></div>
+    <button class="btn-api-save" id="btnApiSave" onclick="saveApiKey()">Save &amp; Continue</button>
+  </div>
+
+  <div class="api-hint">
+    Get a <strong style="color:rgba(255,255,255,0.8)">free</strong> API key at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a><br>
+    Sign up → Keys → Create Key — no card needed 🎉
+  </div>
+</div>
+
 <!-- Install banner -->
 <div id="installBanner">
   <div class="install-txt">
@@ -1103,7 +1312,7 @@ mLink.rel='manifest'; mLink.href=URL.createObjectURL(mBlob);
 document.head.appendChild(mLink);
 
 if('serviceWorker' in navigator){
-  const sw=`const C='cc-v2';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap']).catch(()=>{})));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});self.addEventListener('fetch',e=>{if(e.request.url.includes('anthropic.com'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('',{status:503}))));});`;
+  const sw=`const C='cc-v2';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&display=swap']).catch(()=>{})));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});self.addEventListener('fetch',e=>{if(e.request.url.includes('openrouter.ai'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('',{status:503}))));});`;
   const swBlob=new Blob([sw],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
 }
@@ -1506,7 +1715,51 @@ function enableResultTab(){
 }
 function goScan(){ showScreen('scan'); }
 
-// ── Region toggle ──
+// ── API Key management ──
+let apiKey = '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';
+
+function checkApiKey() {
+  if (!apiKey) {
+    document.getElementById('apiSetup').classList.add('on');
+    return false;
+  }
+  return true;
+}
+
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  const errEl = document.getElementById('apiErr');
+  if (!val.startsWith('sk-or-')) {
+    errEl.textContent = 'OpenRouter keys start with sk-or-  — check and try again';
+    errEl.classList.add('on'); return;
+  }
+  errEl.classList.remove('on');
+  apiKey = val;
+  localStorage.setItem('cc_apikey', apiKey);
+  document.getElementById('apiSetup').classList.remove('on');
+  showToast('✓ API key saved');
+}
+
+function openSettings() {
+  const input = document.getElementById('apiKeyInput');
+  input.value = apiKey ? apiKey.slice(0,12)+'…' : '';
+  document.getElementById('apiErr').classList.remove('on');
+  document.getElementById('apiSetup').classList.add('on');
+}
+
+function toggleApiVis() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+document.getElementById('apiKeyInput').addEventListener('input', () => {
+  document.getElementById('btnApiSave').disabled =
+    document.getElementById('apiKeyInput').value.trim().length < 10;
+  document.getElementById('apiErr').classList.remove('on');
+});
+document.getElementById('btnApiSave').disabled = true;
+
+
 function setRegion(r){
   region = r;
   localStorage.setItem('cc_region', r);
@@ -1534,6 +1787,7 @@ function setRegion(r){
 
 // ── Scan ──
 async function runScan(){
+  if (!checkApiKey()) return;
   hideErr();
   const cfg = REGION_CONFIG[region];
   document.getElementById('loadOverlay').classList.add('on');
@@ -1562,21 +1816,42 @@ async function runScan(){
       return `${k}: ${Math.round(s.reduce((a,x)=>a+v[x],0)/s.length)}g per ${v._unit||'cup'}`;
     }).join('\n');
 
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
+    // Build messages in OpenAI format (OpenRouter is OpenAI-compatible)
+    const sysPrompt = buildSys(dbCtx);
+    const userContent = buildContent();
+
+    const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        "HTTP-Referer": window.location.href,
+        "X-Title": "Chef's Companion"
+      },
       body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:1000,
-        system:buildSys(dbCtx),
-        tools:[{type:"web_search_20250305",name:"web_search"}],
-        messages:[{role:"user",content:buildContent()}]
+        model: "google/gemma-3-27b-it:free",
+        max_tokens: 1500,
+        messages:[
+          {role:"system", content: sysPrompt},
+          {role:"user",   content: userContent}
+        ]
       })
     });
     clearInterval(loadInterval);
     const data=await res.json();
-    if(data.error) throw new Error(data.error.message);
-    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+
+    // OpenRouter error handling
+    if(data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    // OpenAI-format response: choices[0].message.content
+    const raw = data.choices?.[0]?.message?.content || '';
+    if(!raw) throw new Error("Empty response from AI. Please try again.");
+
     const clean=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-    const json=JSON.parse(clean.slice(clean.indexOf('{'),clean.lastIndexOf('}')+1));
+    const startIdx = clean.indexOf('{');
+    const endIdx = clean.lastIndexOf('}');
+    if(startIdx === -1 || endIdx === -1) throw new Error("Could not parse recipe. Try adding more text detail.");
+    const json=JSON.parse(clean.slice(startIdx, endIdx+1));
     // stamp which region this recipe was scanned with
     json._region = region;
 
@@ -1590,7 +1865,10 @@ async function runScan(){
   }catch(err){
     clearInterval(loadInterval);
     document.getElementById('loadOverlay').classList.remove('on');
-    showErr(err.message||"Something went wrong. Please try again.");
+    // Give a helpful message if it's an auth error
+    const msg = err.message||"Something went wrong. Please try again.";
+    const isAuthErr = msg.includes('401') || msg.includes('auth') || msg.includes('key') || msg.includes('API key');
+    showErr(isAuthErr ? "Invalid API key — tap the ⚙ gear icon to update it." : msg);
     document.getElementById('scanBtn').disabled=false;
   }
 }
@@ -1601,28 +1879,32 @@ function buildSys(db){
     ? `Australian recipe assistant. AUS: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml, 1 tsp=${cfg.tsp}ml.`
     : `American recipe assistant. US: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml, 1 tsp=${cfg.tsp}ml.`;
   const srcList = cfg.srcDefaultLabels.join(', ');
-  const webSearch = region === 'AUS'
-    ? 'web_search for AUS gram value from 2+ sources (FSANZ, taste.com.au, AWW, Woolworths) and average'
-    : 'web_search for US gram value from 2+ sources (King Arthur Baking, ATK, USDA, AllRecipes) and average';
   const exampleSources = JSON.stringify(cfg.srcKeys);
   const exampleSrcVals = cfg.srcKeys.map(()=>150).join(',');
   return `You are Chef's Companion, ${r}
-DATABASE (${cfg.name} sources: ${srcList}):
+Use this conversion DATABASE (${cfg.name} sources: ${srcList}) for gram values:
 ${db}
-Extract ALL ingredients. Lookup in DB. If missing, ${webSearch}.
-Whole items (eggs,cloves) → isCount:true.
-Return ONLY JSON:
+For any ingredient NOT in the database, use your best knowledge of ${cfg.name} gram equivalents.
+Whole items like eggs, garlic cloves, bay leaves → isCount:true, set grams to the count number.
+Return ONLY a valid JSON object with NO markdown fences, NO explanation:
 {"title":"Name","servings":"serves 4","ingredients":[{"name":"plain flour","grams":300,"originalQty":"2 cups","note":"sifted","sources":${exampleSources},"sourceValues":[${exampleSrcVals}],"isCount":false}],"instructions":["Step 1"],"sourcesUsed":${JSON.stringify(cfg.srcDefaultLabels)}}`;
 }
+
 function buildContent(){
   const cfg = REGION_CONFIG[region];
   const text=document.getElementById('recipeText').value.trim();
-  const hint = `${region}: 1cup=${cfg.cup}ml, 1tbsp=${cfg.tbsp}ml`;
-  if(photoB64) return [
-    {type:"image",source:{type:"base64",media_type:photoMime,data:photoB64}},
-    {type:"text",text:text?`Recipe image. Context: ${text}`:`Extract recipe. Convert all to grams (${hint}).`}
-  ];
-  return `Extract recipe from this text, convert to grams (${hint}):\n\n${text}`;
+  const hint = `${region}: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml`;
+  // OpenRouter / OpenAI vision format
+  if(photoB64){
+    const imgUrl = `data:${photoMime};base64,${photoB64}`;
+    return [
+      {type:"image_url", image_url:{url: imgUrl}},
+      {type:"text", text: text
+        ? `Extract this recipe image. Extra context: ${text}. Convert all quantities to grams (${hint}).`
+        : `Extract all ingredients and instructions from this recipe image. Convert quantities to grams (${hint}).`}
+    ];
+  }
+  return `Extract all ingredients and instructions from this recipe, converting all quantities to grams (${hint}):\n\n${text}`;
 }
 
 // ── Render Recipe ──
@@ -1833,25 +2115,71 @@ function updateBadge(){
 }
 
 // ── Saved Screen ──
+let searchQuery = '';
+
+function filterSaved(q) {
+  searchQuery = q.trim().toLowerCase();
+  document.getElementById('searchClearBtn').classList.toggle('show', searchQuery.length > 0);
+  renderSaved();
+}
+
+function clearSearch() {
+  document.getElementById('savedSearch').value = '';
+  searchQuery = '';
+  document.getElementById('searchClearBtn').classList.remove('show');
+  renderSaved();
+  document.getElementById('savedSearch').focus();
+}
+
 function renderSaved(){
   const el=document.getElementById('savedContent'); el.innerHTML='';
+  const countChip = document.getElementById('savedCountChip');
+  if(countChip) countChip.textContent = saved.length === 1 ? '1 recipe' : saved.length + ' recipes';
+
   if(!saved.length){
     el.innerHTML=`<div class="saved-empty">
       <div class="saved-empty-icon"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
-      <h3>No saved recipes</h3>
-      <p>Scan a recipe and tap Save to store it here, along with all your notes.</p>
+      <h3>No saved recipes yet</h3>
+      <p>Tap <strong>Scan</strong> below to scan your first recipe.</p>
     </div>`;
     return;
   }
-  saved.forEach((r,i)=>{
+
+  const filtered = searchQuery ? saved.filter(r => {
+    const key=(r.title||'unnamed').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    const recipeNotes = (notes[key]||[]).map(n=>n.text).join(' ').toLowerCase();
+    const ingNames = (r.ingredients||[]).map(i=>i.name).join(' ').toLowerCase();
+    return r.title.toLowerCase().includes(searchQuery)
+      || ingNames.includes(searchQuery)
+      || recipeNotes.includes(searchQuery)
+      || (r.savedAt||'').toLowerCase().includes(searchQuery);
+  }) : saved;
+
+  if(searchQuery && filtered.length === 0){
+    el.innerHTML=`<div class="saved-no-results">No recipes match "${searchQuery}"</div>`;
+    return;
+  }
+
+  filtered.forEach(r => {
+    const origIdx = saved.indexOf(r);
     const key=(r.title||'unnamed').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
     const noteCount=(notes[key]||[]).length;
     const rFlag = r._region==='US' ? '🇺🇸' : '🇦🇺';
-    const rLabel = r._region==='US' ? 'US' : 'AUS';
+
+    let displayTitle = r.title;
+    if(searchQuery && r.title.toLowerCase().includes(searchQuery)){
+      const idx = r.title.toLowerCase().indexOf(searchQuery);
+      displayTitle = r.title.slice(0,idx)
+        + '<mark style="background:rgba(196,154,40,0.28);border-radius:3px;padding:0 2px">'
+        + r.title.slice(idx, idx+searchQuery.length)
+        + '</mark>'
+        + r.title.slice(idx+searchQuery.length);
+    }
+
     const d=document.createElement('div'); d.className='saved-item';
     d.innerHTML=`
-      <button class="saved-item-del" onclick="event.stopPropagation();deleteSaved(${i})">✕</button>
-      <div class="saved-item-name">${r.title}</div>
+      <button class="saved-item-del" onclick="event.stopPropagation();deleteSaved(${origIdx})">✕</button>
+      <div class="saved-item-name">${displayTitle}</div>
       <div class="saved-item-meta">
         <span class="s-chip" style="font-size:0.72rem">${rFlag}</span>
         <span class="s-chip">
@@ -1876,16 +2204,21 @@ function renderSaved(){
         </span>`:''}
       </div>
     `;
-    d.onclick=()=>{
-      recipe=r; scale=1;
-      renderRecipe(); enableResultTab(); showScreen('result');
-    };
+    d.onclick=()=>{ recipe=r; scale=1; renderRecipe(); enableResultTab(); showScreen('result'); };
     el.appendChild(d);
   });
-  const cb=document.createElement('button'); cb.className='saved-clear-btn';
-  cb.textContent='Clear all saved recipes';
-  cb.onclick=()=>{if(confirm('Clear all saved recipes and notes?')){saved=[];localStorage.removeItem('cc_saved');localStorage.removeItem('cc_notes');notes={};updateBadge();renderSaved();}};
-  el.appendChild(cb);
+
+  if(searchQuery && filtered.length > 0){
+    const info = document.createElement('div');
+    info.style.cssText='text-align:center;padding:10px 0 4px;font-size:0.68rem;color:var(--ink-45)';
+    info.textContent = filtered.length + ' of ' + saved.length + ' recipes';
+    el.appendChild(info);
+  } else if(!searchQuery){
+    const cb=document.createElement('button'); cb.className='saved-clear-btn';
+    cb.textContent='Clear all saved recipes';
+    cb.onclick=()=>{if(confirm('Clear all saved recipes and notes?')){saved=[];localStorage.removeItem('cc_saved');localStorage.removeItem('cc_notes');notes={};searchQuery='';updateBadge();renderSaved();}};
+    el.appendChild(cb);
+  }
 }
 function deleteSaved(i){
   saved.splice(i,1);
@@ -1912,6 +2245,8 @@ function hideErr(){document.getElementById('errCard').classList.remove('on');}
 updateBadge();
 // Restore saved region preference
 setRegion(region);
+// Start on the Saved screen
+showScreen('saved');
 </script>
 </body>
 </html>
