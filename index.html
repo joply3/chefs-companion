@@ -117,6 +117,27 @@ html, body {
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+
+/* ── Scan mode toggle ── */
+.mode-toggle {
+  display: flex; background: var(--linen-d);
+  border-radius: 10px; padding: 3px; margin-bottom: 14px;
+  border: 1px solid var(--ink-08);
+}
+.mode-btn {
+  flex: 1; border: none; background: none; cursor: pointer;
+  border-radius: 8px; padding: 9px 8px;
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 700;
+  color: var(--ink-45); transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  letter-spacing: 0.02em;
+}
+.mode-btn.active {
+  background: var(--white); color: var(--forest);
+  box-shadow: 0 1px 4px rgba(26,25,22,0.1);
+}
+.mode-btn svg { flex-shrink: 0; }
+
 /* ── Region Toggle ── */
 .region-toggle {
   display: flex; align-items: center;
@@ -475,51 +496,58 @@ html, body {
   color:#fff; letter-spacing:-0.01em; line-height:1.1; margin-bottom:4px;
 }
 .result-servings { font-size:0.7rem; color:rgba(255,255,255,0.45); }
+.btn-convert-later {
+  margin-top:10px; background:rgba(255,255,255,0.15);
+  border:1.5px solid rgba(255,255,255,0.3); border-radius:8px;
+  padding:8px 14px; color:#fff; font-family:'Lato',sans-serif;
+  font-size:0.75rem; font-weight:700; cursor:pointer;
+  transition:background 0.15s; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-convert-later:active { background:rgba(255,255,255,0.25); }
 
 /* Scaler */
+/* Scaler — compact single row */
 .scaler-card {
   background:var(--white); border-radius:var(--r);
-  padding:14px; margin-bottom:12px;
+  padding:10px 14px; margin-bottom:10px;
   border:1px solid var(--ink-08); box-shadow:var(--sh);
-}
-.scaler-top {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:10px;
+  display:flex; align-items:center; gap:10px;
 }
 .scaler-lbl {
-  font-size:0.64rem; font-weight:700;
+  font-size:0.6rem; font-weight:700;
   letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-45);
+  flex-shrink:0;
 }
 .scaler-big {
-  font-family:'Lato', sans-serif; font-size:1.4rem;
-  font-weight:700; color:var(--forest);
+  font-family:'Lato', sans-serif; font-size:1.1rem;
+  font-weight:700; color:var(--forest); min-width:32px; text-align:center;
 }
-.scaler-row { display:flex; align-items:center; gap:9px; }
+.scaler-row { display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-end; }
 .stepper {
   display:flex; align-items:center;
-  background:var(--linen); border-radius:10px;
+  background:var(--linen); border-radius:8px;
   border:1.5px solid var(--ink-20); overflow:hidden; flex-shrink:0;
 }
 .step-b {
-  width:42px; height:42px; background:none; border:none;
-  font-size:1.2rem; color:var(--ink-70); cursor:pointer;
+  width:32px; height:32px; background:none; border:none;
+  font-size:1.1rem; color:var(--ink-70); cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   transition:background 0.1s;
 }
 .step-b:active { background:var(--forest-l); color:var(--forest); }
-.step-div { width:1px; height:22px; background:var(--ink-20); }
-.q-pills { display:flex; gap:5px; flex-wrap:wrap; }
+.step-div { width:1px; height:18px; background:var(--ink-20); }
+.q-pills { display:flex; gap:4px; }
 .q-p {
-  height:42px; min-width:42px; padding:0 10px;
+  height:32px; min-width:34px; padding:0 7px;
   background:var(--linen); border:1.5px solid var(--ink-20);
-  border-radius:9px; color:var(--ink-70);
-  font-family:'Lato', sans-serif; font-size:0.8rem; font-weight:600;
+  border-radius:7px; color:var(--ink-70);
+  font-family:'Lato', sans-serif; font-size:0.75rem; font-weight:700;
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition:all 0.1s;
 }
 .q-p.on {
   background:var(--forest); border-color:var(--forest); color:#fff;
-  box-shadow:0 2px 8px rgba(27,58,43,0.28);
+  box-shadow:0 1px 5px rgba(27,58,43,0.25);
 }
 .q-p:active:not(.on) { background:var(--forest-l); }
 
@@ -552,11 +580,9 @@ html, body {
 
 /* Ingredient rows */
 .ing-row {
-  display:flex; align-items:center; padding:12px 14px;
-  border-bottom:1px solid var(--linen-d); gap:11px;
-  transition:background 0.1s;
+  display:flex; align-items:center; padding:9px 14px;
+  gap:11px; transition:background 0.1s;
 }
-.ing-row:last-child { border-bottom:none; }
 .ing-row:active { background:var(--linen); }
 .ing-g { flex-shrink:0; text-align:right; min-width:58px; }
 .g-n {
@@ -989,6 +1015,25 @@ html, body {
     <!-- ── SCAN SCREEN ── -->
     <div class="screen" id="scanScreen">
 
+      <!-- Mode toggle -->
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="modeConvert" onclick="setScanMode('convert')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+          Convert to Grams
+        </button>
+        <button class="mode-btn" id="modeUpload" onclick="setScanMode('upload')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload As-Is
+        </button>
+      </div>
+
       <div class="cam-hero" id="camHero">
         <input type="file" id="fileInput" accept="image/*">
         <div class="cam-inner">
@@ -1048,17 +1093,18 @@ html, body {
     <div class="screen" id="resultScreen">
 
       <div class="result-hdr">
-        <div class="result-eyebrow">Converted Recipe</div>
+        <div class="result-eyebrow" id="resultEyebrow">Converted Recipe</div>
         <div class="result-name" id="rName">—</div>
         <div class="result-servings" id="rServings"></div>
+        <button class="btn-convert-later" id="btnConvertLater" onclick="convertNow()" style="display:none">
+          Convert quantities to grams →
+        </button>
       </div>
 
-      <!-- Scaler -->
+      <!-- Scaler compact -->
       <div class="scaler-card">
-        <div class="scaler-top">
-          <span class="scaler-lbl">Scale Recipe</span>
-          <span class="scaler-big" id="scaleVal">1×</span>
-        </div>
+        <span class="scaler-lbl">Scale</span>
+        <span class="scaler-big" id="scaleVal">1×</span>
         <div class="scaler-row">
           <div class="stepper">
             <button class="step-b" onclick="nudge(-0.5)">−</button>
@@ -1072,20 +1118,6 @@ html, body {
             <button class="q-p" onclick="setScale(4)">4×</button>
             <button class="q-p" onclick="setScale(5)">5×</button>
           </div>
-        </div>
-      </div>
-
-      <!-- Trust -->
-      <div class="trust">
-        <div class="trust-icon">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <div class="trust-body">
-          <div class="trust-txt">Averaged from <strong id="srcCnt">4</strong> verified <span id="trustRegionLabel">Australian</span> sources</div>
-          <div class="src-pills" id="srcBadges"></div>
-          <div id="trustMeasurements" style="font-size:0.6rem;color:var(--ink-45);margin-top:5px">1 cup = 250ml · 1 tbsp = 20ml (AUS)</div>
         </div>
       </div>
 
@@ -1152,6 +1184,20 @@ html, body {
         <div class="notes-list" id="notesList"></div>
       </div>
 
+      <!-- Trust bar — at bottom -->
+      <div class="trust" style="margin-bottom:10px">
+        <div class="trust-icon">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="trust-body">
+          <div class="trust-txt">Averaged from <strong id="srcCnt">4</strong> verified <span id="trustRegionLabel">Australian</span> sources</div>
+          <div class="src-pills" id="srcBadges"></div>
+          <div id="trustMeasurements" style="font-size:0.6rem;color:var(--ink-45);margin-top:4px">1 cup = 250ml · 1 tbsp = 20ml (AUS)</div>
+        </div>
+      </div>
+
       <!-- Actions -->
       <div class="btn-row" style="margin-bottom:8px">
         <button class="btn" onclick="doCopy()">
@@ -1160,6 +1206,14 @@ html, body {
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
           </svg>
           Copy
+        </button>
+        <button class="btn" onclick="shareRecipe()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          Send
         </button>
         <button class="btn" onclick="saveRecipe()">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1715,6 +1769,65 @@ function enableResultTab(){
 }
 function goScan(){ showScreen('scan'); }
 
+// ── Scan mode (convert vs upload as-is) ──
+let scanMode = 'convert';
+
+function setScanMode(m) {
+  scanMode = m;
+  document.getElementById('modeConvert').classList.toggle('active', m === 'convert');
+  document.getElementById('modeUpload').classList.toggle('active', m === 'upload');
+  const span = document.getElementById('scanBtnRegion');
+  if(m === 'upload') {
+    if(span) span.textContent = 'As-Is';
+  } else {
+    if(span) span.textContent = REGION_CONFIG[region].scanLabel;
+  }
+}
+
+// ── Share / Send recipe ──
+function shareRecipe() {
+  if(!recipe) return;
+  const rcfg = REGION_CONFIG[recipe._region||region]||REGION_CONFIG.AUS;
+  let t = `🍳 ${recipe.title}`;
+  if(recipe.servings) t += ` (${recipe.servings})`;
+  if(scale !== 1) t += ` — scaled ${scale}×`;
+  t += `\n${'─'.repeat(32)}\nINGREDIENTS\n`;
+  (recipe.ingredients||[]).forEach(ing => {
+    const g = Math.round((ing.grams||0) * scale * 10) / 10;
+    if(ing.isCount) {
+      t += `  ${g}  ${ing.name}`;
+    } else {
+      t += `  ${fmtG(g)}g  ${ing.name}`;
+    }
+    if(ing.note) t += ` (${ing.note})`;
+    t += '\n';
+  });
+  if(recipe.instructions?.length){
+    t += `\nMETHOD\n`;
+    recipe.instructions.forEach((s,i) => t += `  ${i+1}. ${s}\n`);
+  }
+  t += `\n${rcfg.measureLine}`;
+  // Use native share sheet on mobile, else copy to clipboard
+  if(navigator.share) {
+    navigator.share({ title: recipe.title, text: t }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(t).then(() => showToast('✓ Copied — paste anywhere to share'));
+  }
+}
+
+// ── Convert later (upload-mode recipes) ──
+function convertNow() {
+  if(!recipe) return;
+  const rawText = (recipe.ingredients||[]).map(i => `${i.originalQty||''} ${i.name}`).join('\n')
+    + (recipe.instructions?.length ? '\n\n' + recipe.instructions.join('\n') : '');
+  document.getElementById('recipeText').value = rawText;
+  clearPhoto();
+  scanMode = 'convert';
+  setScanMode('convert');
+  document.getElementById('btnConvertLater').style.display = 'none';
+  runScan();
+}
+
 // ── API Key management ──
 let apiKey = localStorage.getItem('cc_apikey') || '';
 
@@ -1792,6 +1905,48 @@ function setRegion(r){
 async function runScan(){
   if (!checkApiKey()) return;
   hideErr();
+
+  // ── UPLOAD MODE: just extract text as-is without AI conversion ──
+  if(scanMode === 'upload') {
+    const text = document.getElementById('recipeText').value.trim();
+    if(!text && !photoB64) return;
+    document.getElementById('loadOverlay').classList.add('on');
+    document.getElementById('scanBtn').disabled = true;
+    document.getElementById('ldTitle').textContent = 'Uploading recipe…';
+    document.getElementById('ldSub').textContent = 'Keeping original quantities';
+    document.getElementById('ldChips').innerHTML = '';
+
+    if(photoB64) {
+      // For photo in upload mode, still need AI to extract text but not convert
+      // Fall through to AI but with a different system prompt
+    } else {
+      // Pure text — parse directly without AI
+      const lines = text.split('\n').filter(l => l.trim());
+      const ingredients = lines.map(l => {
+        const m = l.trim().match(/^([\d\/\.\s½¼¾⅓⅔⅛]+\s*(?:cups?|tbsp?|tsp?|tablespoons?|teaspoons?|g|kg|ml|l|oz|lb|lbs)?\.?)\s+(.+)$/i);
+        if(m) return { name: m[2].trim(), grams: 0, originalQty: m[1].trim(), isCount: false, sources: ['est'], sourceValues: [] };
+        return { name: l.trim(), grams: 0, originalQty: '', isCount: false, sources: ['est'], sourceValues: [] };
+      });
+      recipe = {
+        title: 'My Recipe',
+        servings: '',
+        ingredients,
+        instructions: [],
+        sourcesUsed: [],
+        _region: region,
+        _uploadMode: true
+      };
+      scale = 1;
+      renderRecipe();
+      enableResultTab();
+      document.getElementById('loadOverlay').classList.remove('on');
+      showScreen('result');
+      document.getElementById('scanBtn').disabled = false;
+      if(navigator.vibrate) navigator.vibrate([25,15,50]);
+      return;
+    }
+  }
+
   const cfg = REGION_CONFIG[region];
   document.getElementById('loadOverlay').classList.add('on');
   document.getElementById('scanBtn').disabled=true;
@@ -1823,14 +1978,18 @@ async function runScan(){
     const sysPrompt = buildSys(dbCtx);
     const userContent = buildContent();
 
-    // Use openrouter/free first — it auto-picks the best available free model
-    // including vision-capable ones when a photo is attached
-    const FREE_MODELS = [
-      "openrouter/free",
+    // Vision models for photos, text-only models for text input
+    const VISION_MODELS = [
       "qwen/qwen2.5-vl-72b-instruct:free",
-      "mistralai/mistral-small-3.1-24b-instruct:free",
-      "meta-llama/llama-3.2-11b-vision-instruct:free"
+      "meta-llama/llama-3.2-11b-vision-instruct:free",
+      "google/gemini-2.0-flash-exp:free"
     ];
+    const TEXT_MODELS = [
+      "mistralai/mistral-small-3.1-24b-instruct:free",
+      "google/gemma-3-12b-it:free",
+      "qwen/qwen2.5-72b-instruct:free"
+    ];
+    const FREE_MODELS = photoB64 ? VISION_MODELS : TEXT_MODELS;
 
     let data = null;
     let lastErr = null;
@@ -1957,6 +2116,16 @@ function renderRecipe(){
   document.getElementById('ingCnt').textContent=(recipe.ingredients||[]).length+' items';
   buildBadges(recipe.sourcesUsed||[]);
   updateScaleDisplay();
+
+  // Upload mode: show eyebrow + convert button, hide scaler (no gram values)
+  const isUpload = !!recipe._uploadMode;
+  const eyebrow = document.getElementById('resultEyebrow');
+  const convertBtn = document.getElementById('btnConvertLater');
+  const scalerCard = document.querySelector('.scaler-card');
+  if(eyebrow) eyebrow.textContent = isUpload ? 'Uploaded Recipe' : 'Converted Recipe';
+  if(convertBtn) convertBtn.style.display = isUpload ? 'inline-flex' : 'none';
+  if(scalerCard) scalerCard.style.display = isUpload ? 'none' : '';
+
   renderIngredients();
   renderInstructions();
   renderNotes();
