@@ -1716,7 +1716,7 @@ function enableResultTab(){
 function goScan(){ showScreen('scan'); }
 
 // ── API Key management ──
-let apiKey = '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';
+let apiKey = localStorage.getItem('cc_apikey') || '';
 
 function checkApiKey() {
   if (!apiKey) {
@@ -1742,8 +1742,11 @@ function saveApiKey() {
 
 function openSettings() {
   const input = document.getElementById('apiKeyInput');
-  input.value = apiKey ? apiKey.slice(0,12)+'…' : '';
+  // Clear the field so they can type a new key
+  input.value = '';
+  input.placeholder = 'Paste your new sk-or-v1-... key';
   document.getElementById('apiErr').classList.remove('on');
+  document.getElementById('btnApiSave').disabled = true;
   document.getElementById('apiSetup').classList.add('on');
 }
 
@@ -1820,31 +1823,58 @@ async function runScan(){
     const sysPrompt = buildSys(dbCtx);
     const userContent = buildContent();
 
-    const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": window.location.href,
-        "X-Title": "Chef's Companion"
-      },
-      body:JSON.stringify({
-        model: "openrouter/auto",
-        max_tokens: 1500,
-        messages:[
-          {role:"system", content: sysPrompt},
-          {role:"user",   content: userContent}
-        ]
-      })
-    });
-    clearInterval(loadInterval);
-    const data=await res.json();
+    // Free vision-capable models to try in order
+    const FREE_MODELS = [
+      "meta-llama/llama-3.2-11b-vision-instruct:free",
+      "google/gemma-3-12b-it:free",
+      "mistralai/mistral-7b-instruct:free"
+    ];
 
-    // OpenRouter error handling — show full error for debugging
-    if(!res.ok || data.error){
-      const errMsg = data.error?.message || data.error?.code || JSON.stringify(data.error) || `HTTP ${res.status}`;
-      throw new Error(errMsg);
+    let data = null;
+    let lastErr = null;
+
+    for(const model of FREE_MODELS){
+      try {
+        const res = await fetch("https://openrouter.ai/api/v1/chat/completions",{
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "Authorization": `Bearer ${apiKey}`,
+            "HTTP-Referer": window.location.href,
+            "X-Title": "Chef's Companion"
+          },
+          body:JSON.stringify({
+            model,
+            max_tokens: 1500,
+            messages:[
+              {role:"system", content: sysPrompt},
+              {role:"user",   content: userContent}
+            ]
+          })
+        });
+        const d = await res.json();
+        if(!res.ok || d.error){
+          lastErr = d.error?.message || d.error?.code || `HTTP ${res.status}`;
+          // Auth errors — no point trying other models
+          if(res.status === 401 || res.status === 403 || (lastErr||'').toLowerCase().includes('user not found')){
+            throw new Error(lastErr);
+          }
+          continue; // try next model
+        }
+        data = d;
+        break;
+      } catch(fetchErr) {
+        // Auth errors propagate immediately
+        if(fetchErr.message && (fetchErr.message.includes('user not found') || fetchErr.message.includes('401'))){
+          throw fetchErr;
+        }
+        lastErr = fetchErr.message;
+      }
     }
+
+    if(!data) throw new Error(lastErr || "All models failed. Please try again.");
+
+    clearInterval(loadInterval);
 
     // OpenAI-format response: choices[0].message.content
     const raw = data.choices?.[0]?.message?.content || '';
@@ -1868,10 +1898,16 @@ async function runScan(){
   }catch(err){
     clearInterval(loadInterval);
     document.getElementById('loadOverlay').classList.remove('on');
-    // Give a helpful message if it's an auth error
-    const msg = err.message||"Something went wrong. Please try again.";
-    const isAuthErr = msg.includes('401') || msg.includes('auth') || msg.includes('key') || msg.includes('API key');
-    showErr(isAuthErr ? "Invalid API key — tap the ⚙ gear icon to update it." : msg);
+    const msg = err.message || "Something went wrong. Please try again.";
+    const isAuthErr = msg.toLowerCase().includes('user not found')
+      || msg.includes('401') || msg.toLowerCase().includes('invalid')
+      || msg.toLowerCase().includes('unauthorized') || msg.toLowerCase().includes('no auth');
+    if(isAuthErr){
+      showErr("API key rejected — please update your key in Settings ⚙");
+      setTimeout(()=> openSettings(), 800);
+    } else {
+      showErr(msg);
+    }
     document.getElementById('scanBtn').disabled=false;
   }
 }
@@ -2246,10 +2282,12 @@ function hideErr(){document.getElementById('errCard').classList.remove('on');}
 
 // ── Init ──
 updateBadge();
-// Restore saved region preference
 setRegion(region);
-// Start on the Saved screen
 showScreen('saved');
+// Show API key screen on first launch if no key saved
+if (!apiKey) {
+  setTimeout(() => document.getElementById('apiSetup').classList.add('on'), 300);
+}
 </script>
 </body>
 </html>
