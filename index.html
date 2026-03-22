@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chef's">
+<meta name="theme-color" content="#1B3A2B">
+<title>Chef's Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   RESET + DESIGN TOKENS
+══════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+:root {
+  --forest:    #1B3A2B;
+  --forest-m:  #2D5C44;
+  --forest-l:  rgba(27,58,43,0.09);
+  --forest-ll: rgba(27,58,43,0.05);
+  --linen:     #F6F1E9;
+  --linen-d:   #EDE7DB;
+  --white:     #FDFBF8;
+  --ink:       #1A1916;
+  --ink-70:    rgba(26,25,22,0.7);
+  --ink-45:    rgba(26,25,22,0.45);
+  --ink-20:    rgba(26,25,22,0.2);
+  --ink-08:    rgba(26,25,22,0.08);
+  --terra:     #B85C38;
+  --terra-l:   rgba(184,92,56,0.1);
+  --gold:      #C49A28;
+  --gold-l:    rgba(196,154,40,0.1);
+  --sage:      #4A7C5A;
+  --red:       #D94F38;
+  --blue:      #3A6FD8;
+  --safe-top:  env(safe-area-inset-top, 0px);
+  --safe-bot:  env(safe-area-inset-bottom, 0px);
+  --safe-l:    env(safe-area-inset-left, 0px);
+  --safe-r:    env(safe-area-inset-right, 0px);
+  --nav-h:     64px;
+  --r:         16px;
+  --r-s:       10px;
+  --r-xs:      7px;
+  --sh:        0 1px 3px rgba(26,25,22,0.07), 0 4px 14px rgba(26,25,22,0.05);
+  --sh-m:      0 4px 20px rgba(26,25,22,0.1), 0 1px 4px rgba(26,25,22,0.06);
+}
+
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  background: var(--forest);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════ */
+#app {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--linen);
+  overflow: hidden;
+}
+
+/* Safe area top spacer */
+#safeTop {
+  height: var(--safe-top);
+  background: var(--forest);
+  flex-shrink: 0;
+}
+
+/* ── Top Bar ── */
+#topBar {
+  height: 54px;
+  background: var(--forest);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  position: relative; z-index: 20;
+}
+.top-brand { display: flex; align-items: center; gap: 9px; }
+.top-logo-box {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.88);
+}
+.top-name {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem; font-weight: 700; font-style: italic;
+  color: #fff;
+}
+.top-right { display: flex; align-items: center; gap: 8px; }
+.live-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 0.6rem; font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.05em;
+}
+.live-dot {
+  width: 6px; height: 6px; background: #5DC87A;
+  border-radius: 50%;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── Region Toggle ── */
+.region-toggle {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+}
+.region-btn {
+  border: none; background: none; cursor: pointer;
+  border-radius: 16px; padding: 4px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.07em; color: rgba(255,255,255,0.45);
+  transition: background 0.2s, color 0.2s;
+  display: flex; align-items: center; gap: 5px;
+  white-space: nowrap;
+}
+.region-btn.active {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.region-btn .flag { font-size: 0.85rem; line-height: 1; }
+
+/* ── Scroll Content ── */
+#content {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ── Bottom Nav ── */
+#bottomNav {
+  height: calc(var(--nav-h) + var(--safe-bot));
+  background: var(--white);
+  border-top: 1px solid var(--ink-08);
+  display: flex; align-items: flex-start;
+  padding: 8px calc(16px + var(--safe-r)) 0 calc(16px + var(--safe-l));
+  flex-shrink: 0;
+  box-shadow: 0 -2px 16px rgba(26,25,22,0.06);
+  position: relative; z-index: 20;
+}
+.nav-tab {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  border: none; background: none; cursor: pointer;
+  padding: 4px 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s;
+  position: relative;
+}
+.nav-tab:active { transform: scale(0.88); }
+.nav-icon-wrap { position: relative; }
+.nav-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-45);
+  transition: background 0.15s, color 0.15s;
+}
+.nav-tab.active .nav-icon {
+  background: var(--forest-l);
+  color: var(--forest);
+}
+.nav-lbl {
+  font-size: 0.59rem; font-weight: 600;
+  letter-spacing: 0.04em; color: var(--ink-45);
+  transition: color 0.15s;
+}
+.nav-tab.active .nav-lbl { color: var(--forest); }
+.nav-badge {
+  position: absolute; top: -2px; right: -4px;
+  width: 16px; height: 16px;
+  background: var(--terra); border-radius: 50%;
+  font-size: 0.52rem; font-weight: 700; color: #fff;
+  display: none; align-items: center; justify-content: center;
+  border: 2px solid var(--white);
+}
+.nav-badge.on { display: flex; }
+
+/* ══════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════ */
+.screen {
+  display: none;
+  padding: 16px 16px 24px;
+  min-height: 100%;
+}
+.screen.active {
+  display: block;
+  animation: screenIn 0.2s ease;
+}
+@keyframes screenIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ══════════════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border-radius: var(--r);
+  border: 1px solid var(--ink-08);
+  overflow: hidden;
+  box-shadow: var(--sh);
+}
+.card-hd {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 14px 10px;
+  background: var(--linen);
+  border-bottom: 1px solid var(--ink-08);
+}
+.card-hd svg { color: var(--ink-45); flex-shrink: 0; }
+.card-hd-title {
+  font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-45);
+  flex: 1;
+}
+.card-hd-action {
+  font-size: 0.66rem; font-weight: 600; color: var(--forest);
+  background: none; border: none; cursor: pointer; padding: 2px 0;
+}
+
+/* Section block (used in result) */
+.sec {
+  background: var(--white);
+  border-radius: var(--r);
+  border: 1px solid var(--ink-08);
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: var(--sh);
+}
+.sec-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--linen);
+  border-bottom: 1px solid var(--ink-08);
+}
+.sec-hd-l { display: flex; align-items: center; gap: 8px; }
+.sec-hd-l svg { color: var(--forest); }
+.sec-hd span {
+  font-size: 0.67rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+}
+.sec-chip {
+  background: var(--linen-d); border: 1px solid var(--ink-20);
+  border-radius: 10px; padding: 2px 9px;
+  font-size: 0.59rem; font-weight: 600; color: var(--ink-45);
+}
+
+/* Btn row */
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  display: flex; align-items: center; gap: 7px;
+  border-radius: var(--r-s); padding: 11px 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: all 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  border: 1.5px solid var(--ink-20);
+  background: var(--white); color: var(--ink-70);
+  box-shadow: var(--sh);
+}
+.btn:active { transform: scale(0.96); }
+.btn.primary {
+  background: var(--forest); border-color: var(--forest); color: #fff;
+  box-shadow: 0 3px 12px rgba(27,58,43,0.28);
+}
+.btn.primary:active { background: var(--forest-m); }
+.btn.ghost { background: none; box-shadow: none; border-color: var(--ink-20); color: var(--ink-45); }
+.btn.danger { border-color: rgba(184,92,56,0.3); color: var(--terra); background: none; box-shadow: none; }
+.btn.danger:active { background: var(--terra-l); }
+.btn.sm { padding: 8px 12px; font-size: 0.68rem; }
+
+/* ══════════════════════════════════════════════
+   SCREEN: SCAN
+══════════════════════════════════════════════ */
+.cam-hero {
+  background: var(--forest);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative; cursor: pointer;
+}
+.cam-hero input[type="file"] {
+  position: absolute; inset: 0; opacity: 0;
+  width: 100%; height: 100%; cursor: pointer; z-index: 5;
+}
+.cam-inner {
+  padding: 32px 20px 26px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px; text-align: center;
+  position: relative;
+  transition: background 0.12s;
+}
+.cam-hero:active .cam-inner { background: rgba(255,255,255,0.04); }
+.cam-rings { position: relative; width: 80px; height: 80px;
+  display: flex; align-items: center; justify-content: center; }
+.cam-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.cam-ring.r1 { width:80px; height:80px; }
+.cam-ring.r2 { width:58px; height:58px; }
+.cam-circle {
+  width: 62px; height: 62px;
+  background: rgba(255,255,255,0.14);
+  border: 2px solid rgba(255,255,255,0.28);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; position: relative; z-index: 1;
+  transition: transform 0.12s;
+}
+.cam-hero:active .cam-circle { transform: scale(0.94); }
+.cam-title {
+  font-family: 'Lora', serif;
+  font-size: 1.1rem; font-weight: 700; font-style: italic;
+  color: #fff;
+}
+.cam-sub {
+  font-size: 0.66rem; color: rgba(255,255,255,0.45);
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+
+/* Photo preview */
+.photo-prev { display: none; margin-bottom: 12px; }
+.photo-prev.on { display: block; }
+.photo-prev img {
+  width: 100%; max-height: 210px; object-fit: cover;
+  border-radius: var(--r) var(--r) 0 0; display: block;
+}
+.photo-prev-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1px solid var(--ink-08); border-top: none;
+  border-radius: 0 0 var(--r) var(--r);
+}
+.photo-prev-info {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 0.72rem; font-weight: 500; color: var(--ink-70);
+}
+.photo-prev-info::before {
+  content:''; width:8px; height:8px;
+  background: var(--sage); border-radius:50%;
+}
+.btn-remove {
+  font-size: 0.7rem; font-weight: 600; color: var(--terra);
+  background: none; border: none; cursor: pointer;
+  padding: 4px 8px; border-radius: 6px;
+}
+.btn-remove:active { background: var(--terra-l); }
+
+/* Recipe textarea */
+.recipe-ta {
+  width: 100%; border: none; outline: none;
+  background: transparent; resize: none;
+  padding: 14px; min-height: 130px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; line-height: 1.7; color: var(--ink);
+  caret-color: var(--forest);
+}
+.recipe-ta::placeholder { color: var(--ink-45); font-style: italic; }
+
+/* Error */
+.err-card {
+  display: none; align-items: flex-start; gap: 9px;
+  background: rgba(217,79,56,0.07);
+  border: 1.5px solid rgba(217,79,56,0.25);
+  border-radius: var(--r-s);
+  padding: 12px 14px; margin-bottom: 12px;
+  font-size: 0.8rem; color: var(--red);
+}
+.err-card.on { display: flex; }
+
+/* Scan button */
+.btn-scan {
+  width: 100%; background: var(--forest); color: #fff;
+  border: none; border-radius: var(--r); padding: 17px;
+  font-family: 'Lora', serif;
+  font-size: 1.05rem; font-weight: 700; font-style: italic;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; box-shadow: 0 3px 14px rgba(27,58,43,0.3);
+  transition: background 0.12s, transform 0.1s;
+  position: relative; overflow: hidden;
+}
+.btn-scan::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg,rgba(255,255,255,0.06),transparent 50%);
+  pointer-events:none;
+}
+.btn-scan:active:not(:disabled) { transform:scale(0.98); background:var(--forest-m); }
+.btn-scan:disabled { background:var(--ink-20); box-shadow:none; color:var(--ink-45); }
+
+/* ══════════════════════════════════════════════
+   LOADING OVERLAY
+══════════════════════════════════════════════ */
+#loadOverlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: var(--linen);
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; text-align: center;
+}
+#loadOverlay.on { display: flex; }
+.ld-spinner { position:relative; width:76px; height:76px; margin-bottom:26px; }
+.ld-ring {
+  position:absolute; inset:0; border-radius:50%;
+  border:2.5px solid var(--ink-08); border-top-color:var(--forest);
+  animation: spin 1.1s cubic-bezier(0.5,0.1,0.5,0.9) infinite;
+}
+.ld-ring-i {
+  position:absolute; inset:11px; border-radius:50%;
+  border:2px solid var(--ink-08); border-bottom-color:var(--terra);
+  animation: spin 1.7s cubic-bezier(0.5,0.1,0.5,0.9) infinite reverse;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.ld-title {
+  font-family:'Lora',serif; font-size:1.25rem;
+  font-weight:600; font-style:italic; color:var(--ink); margin-bottom:5px;
+}
+.ld-sub { font-size:0.72rem; color:var(--ink-45); margin-bottom:22px; }
+.ld-chips { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; }
+.ld-chip {
+  font-size:0.61rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+  padding:4px 11px; border-radius:20px;
+  background:var(--white); border:1.5px solid var(--ink-08); color:var(--ink-45);
+  opacity:0; transform:translateY(5px);
+  animation:chipIn 0.3s ease forwards; box-shadow:var(--sh);
+}
+@keyframes chipIn { to { opacity:1; transform:translateY(0); } }
+
+/* ══════════════════════════════════════════════
+   SCREEN: RESULT
+══════════════════════════════════════════════ */
+.result-hdr {
+  background: var(--forest);
+  margin: -16px -16px 14px;
+  padding: 18px 18px 20px;
+  position: relative; overflow: hidden;
+}
+.result-hdr::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.04),transparent 55%);
+  pointer-events:none;
+}
+.result-eyebrow {
+  font-size:0.59rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
+  color:rgba(255,255,255,0.4); margin-bottom:4px;
+  display:flex; align-items:center; gap:6px;
+}
+.result-eyebrow::before { content:''; width:14px; height:1.5px; background:rgba(255,255,255,0.25); }
+.result-name {
+  font-family:'Lora',serif; font-size:1.5rem; font-weight:700;
+  color:#fff; letter-spacing:-0.01em; line-height:1.1; margin-bottom:4px;
+}
+.result-servings { font-size:0.7rem; color:rgba(255,255,255,0.45); }
+
+/* Scaler */
+.scaler-card {
+  background:var(--white); border-radius:var(--r);
+  padding:14px; margin-bottom:12px;
+  border:1px solid var(--ink-08); box-shadow:var(--sh);
+}
+.scaler-top {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.scaler-lbl {
+  font-size:0.64rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-45);
+}
+.scaler-big {
+  font-family:'Lora',serif; font-size:1.4rem;
+  font-weight:700; color:var(--forest);
+}
+.scaler-row { display:flex; align-items:center; gap:9px; }
+.stepper {
+  display:flex; align-items:center;
+  background:var(--linen); border-radius:10px;
+  border:1.5px solid var(--ink-20); overflow:hidden; flex-shrink:0;
+}
+.step-b {
+  width:42px; height:42px; background:none; border:none;
+  font-size:1.2rem; color:var(--ink-70); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 0.1s;
+}
+.step-b:active { background:var(--forest-l); color:var(--forest); }
+.step-div { width:1px; height:22px; background:var(--ink-20); }
+.q-pills { display:flex; gap:5px; flex-wrap:wrap; }
+.q-p {
+  height:42px; min-width:42px; padding:0 10px;
+  background:var(--linen); border:1.5px solid var(--ink-20);
+  border-radius:9px; color:var(--ink-70);
+  font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.1s;
+}
+.q-p.on {
+  background:var(--forest); border-color:var(--forest); color:#fff;
+  box-shadow:0 2px 8px rgba(27,58,43,0.28);
+}
+.q-p:active:not(.on) { background:var(--forest-l); }
+
+/* Trust bar */
+.trust {
+  background:var(--white); border-radius:var(--r-s);
+  padding:11px 13px; margin-bottom:12px;
+  border:1px solid var(--ink-08);
+  display:flex; gap:10px; box-shadow:var(--sh);
+}
+.trust-icon {
+  width:26px; height:26px; flex-shrink:0;
+  background:var(--forest-l); border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--forest); margin-top:1px;
+}
+.trust-body { flex:1; }
+.trust-txt { font-size:0.69rem; color:var(--ink-70); line-height:1.5; }
+.trust-txt strong { color:var(--forest); font-weight:600; }
+.src-pills { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+.src-b {
+  font-size:0.57rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+  padding:3px 8px; border-radius:20px; border:1.5px solid;
+}
+.src-b.fsanz      { background:rgba(74,124,90,0.08);  border-color:rgba(74,124,90,0.22);  color:#357050; }
+.src-b.aww        { background:rgba(196,154,40,0.08); border-color:rgba(196,154,40,0.28); color:#8A6A10; }
+.src-b.taste      { background:rgba(184,92,56,0.08);  border-color:rgba(184,92,56,0.22);  color:#A03820; }
+.src-b.woolworths { background:rgba(27,120,69,0.08);  border-color:rgba(27,120,69,0.22);  color:#1A7040; }
+.src-b.web        { background:rgba(58,111,216,0.07); border-color:rgba(58,111,216,0.2);  color:#2E5BB0; }
+
+/* Ingredient rows */
+.ing-row {
+  display:flex; align-items:center; padding:12px 14px;
+  border-bottom:1px solid var(--linen-d); gap:11px;
+  transition:background 0.1s;
+}
+.ing-row:last-child { border-bottom:none; }
+.ing-row:active { background:var(--linen); }
+.ing-g { flex-shrink:0; text-align:right; min-width:58px; }
+.g-n {
+  font-family:'Lora',serif; font-size:1.25rem;
+  font-weight:700; color:var(--forest); line-height:1;
+}
+.g-l {
+  font-size:0.5rem; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--ink-45); margin-top:1px;
+}
+.ing-sep { width:1px; height:34px; background:var(--ink-08); flex-shrink:0; }
+.ing-body { flex:1; min-width:0; }
+.i-nm {
+  font-size:0.9rem; font-weight:500; color:var(--ink);
+  text-transform:capitalize;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.i-orig {
+  font-size:0.68rem; color:var(--ink-45);
+  font-style:italic; font-family:'Lora',serif; margin-top:1px;
+}
+.i-note { font-size:0.64rem; color:var(--ink-45); font-style:italic; margin-top:1px; }
+.ing-srcs { flex-shrink:0; display:flex; flex-direction:column; gap:3px; align-items:flex-end; }
+.src-dot {
+  font-size:0.5rem; font-weight:700; letter-spacing:0.04em;
+  padding:2px 6px; border-radius:7px; border:1px solid; cursor:help;
+}
+.src-dot.fsanz      { background:rgba(74,124,90,0.07);  border-color:rgba(74,124,90,0.2);  color:#357050; }
+.src-dot.aww        { background:rgba(196,154,40,0.07); border-color:rgba(196,154,40,0.25);color:#8A6A10; }
+.src-dot.taste      { background:rgba(184,92,56,0.07);  border-color:rgba(184,92,56,0.2);  color:#A03820; }
+.src-dot.woolworths { background:rgba(27,120,69,0.07);  border-color:rgba(27,120,69,0.2);  color:#1A7040; }
+.src-dot.web        { background:rgba(58,111,216,0.06); border-color:rgba(58,111,216,0.18);color:#2E5BB0; }
+.src-dot.est        { background:var(--linen); border-color:var(--ink-20); color:var(--ink-45); }
+
+/* Steps */
+.step-row {
+  display:flex; gap:13px; padding:13px 14px;
+  border-bottom:1px solid var(--linen-d); align-items:flex-start;
+}
+.step-row:last-child { border-bottom:none; }
+.step-n {
+  font-family:'Lora',serif; font-size:0.95rem; font-weight:700;
+  color:var(--forest); min-width:22px; opacity:0.55; padding-top:2px;
+}
+.step-t { font-size:0.84rem; line-height:1.72; color:var(--ink-70); }
+
+/* ══════════════════════════════════════════════
+   NOTES SECTION
+══════════════════════════════════════════════ */
+.notes-add-area {
+  padding: 14px;
+  border-bottom: 1px solid var(--ink-08);
+}
+.notes-ta-wrap {
+  position: relative;
+}
+.notes-ta {
+  width: 100%; border: 1.5px solid var(--ink-20);
+  border-radius: var(--r-s); padding: 11px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.86rem; line-height: 1.65; color: var(--ink);
+  background: var(--linen); outline: none; resize: none;
+  min-height: 80px; caret-color: var(--forest);
+  transition: border-color 0.15s;
+}
+.notes-ta:focus { border-color: var(--forest); background: var(--white); }
+.notes-ta::placeholder { color: var(--ink-45); font-style: italic; }
+.notes-add-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 9px;
+}
+.notes-char-count {
+  font-size: 0.62rem; color: var(--ink-45);
+}
+.btn-add-note {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--forest); border: none; border-radius: var(--r-xs);
+  padding: 9px 14px; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: background 0.12s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(27,58,43,0.25);
+}
+.btn-add-note:active { transform: scale(0.95); background: var(--forest-m); }
+.btn-add-note:disabled { background: var(--ink-20); box-shadow: none; color: var(--ink-45); }
+
+/* Note items */
+.notes-list { padding: 0; }
+.note-item {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--linen-d);
+  position: relative;
+  animation: noteIn 0.22s ease;
+}
+.note-item:last-child { border-bottom: none; }
+@keyframes noteIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+.note-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.note-date-wrap {
+  display: flex; align-items: center; gap: 6px;
+}
+.note-date-icon {
+  width: 18px; height: 18px;
+  background: var(--forest-l); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--forest);
+}
+.note-date {
+  font-size: 0.62rem; font-weight: 600;
+  color: var(--forest); letter-spacing: 0.04em;
+}
+.note-time {
+  font-size: 0.58rem; color: var(--ink-45);
+  margin-left: 4px;
+}
+.btn-del-note {
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-45); padding: 2px 4px; border-radius: 4px;
+  font-size: 0.75rem; transition: color 0.1s, background 0.1s;
+}
+.btn-del-note:active { color: var(--red); background: rgba(217,79,56,0.08); }
+.note-text {
+  font-size: 0.85rem; line-height: 1.65; color: var(--ink-70);
+  white-space: pre-wrap; word-break: break-word;
+}
+.notes-empty {
+  padding: 28px 14px; text-align: center;
+  color: var(--ink-45); font-size: 0.78rem;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════════
+   SCREEN: SAVED (HISTORY)
+══════════════════════════════════════════════ */
+.saved-empty {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  padding: 64px 24px; text-align: center;
+}
+.saved-empty-icon {
+  width: 64px; height: 64px;
+  background: var(--forest-l); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--forest); opacity: 0.55;
+}
+.saved-empty h3 {
+  font-family:'Lora',serif; font-size:1.05rem;
+  font-weight:600; color:var(--ink-70);
+}
+.saved-empty p { font-size:0.78rem; color:var(--ink-45); max-width:180px; line-height:1.5; }
+
+.saved-item {
+  background: var(--white);
+  border-radius: var(--r); border: 1px solid var(--ink-08);
+  padding: 14px; margin-bottom: 10px;
+  cursor: pointer; box-shadow: var(--sh);
+  transition: transform 0.12s, box-shadow 0.12s;
+  position: relative;
+}
+.saved-item:active { transform: scale(0.98); }
+.saved-item-name {
+  font-family:'Lora',serif; font-size:1rem;
+  font-weight:700; color:var(--ink); margin-bottom:6px;
+  padding-right: 30px;
+}
+.saved-item-meta {
+  display:flex; flex-wrap:wrap; gap:10px;
+}
+.s-chip {
+  display:flex; align-items:center; gap:4px;
+  font-size:0.62rem; font-weight:500; color:var(--ink-45);
+}
+.s-chip svg { color:var(--sage); }
+.s-chip.note-chip { color: var(--blue); }
+.s-chip.note-chip svg { color: var(--blue); }
+.saved-item-del {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--linen-d); border: none;
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-45); cursor: pointer; font-size: 0.75rem;
+  transition: background 0.1s, color 0.1s;
+}
+.saved-item-del:active { background: rgba(217,79,56,0.12); color: var(--red); }
+.saved-clear-btn {
+  text-align: center; padding: 14px 0 4px;
+  font-size: 0.72rem; color: var(--terra);
+  font-weight: 500; cursor: pointer; background: none; border: none;
+  width: 100%;
+}
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+#toast {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bot) + 14px);
+  left: 50%; transform: translateX(-50%) translateY(16px);
+  background: var(--ink); color: #fff;
+  padding: 10px 18px; border-radius: 20px;
+  font-size: 0.78rem; font-weight: 500;
+  opacity: 0; transition: all 0.22s;
+  pointer-events: none; white-space: nowrap; z-index: 500;
+  box-shadow: var(--sh-m);
+}
+#toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════════════
+   INSTALL BANNER
+══════════════════════════════════════════════ */
+#installBanner {
+  display: none; position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bot) + 12px);
+  left: 12px; right: 12px; z-index: 400;
+  background: var(--forest); border-radius: var(--r);
+  padding: 14px 16px; box-shadow: var(--sh-m);
+  animation: slideUp 0.3s ease;
+}
+#installBanner.on { display: flex; align-items: center; gap: 12px; }
+@keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.install-txt { flex:1; color:#fff; font-size:0.8rem; font-weight:500; line-height:1.45; }
+.install-txt strong { font-weight:700; display:block; margin-bottom:1px; }
+.btn-inst {
+  background:rgba(255,255,255,0.14); border:1.5px solid rgba(255,255,255,0.28);
+  border-radius:8px; padding:8px 14px;
+  font-size:0.7rem; font-weight:600; color:#fff; cursor:pointer; white-space:nowrap;
+}
+.btn-inst-x {
+  background:none; border:none; color:rgba(255,255,255,0.35);
+  font-size:1.1rem; cursor:pointer; padding:4px; flex-shrink:0;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="safeTop"></div>
+
+  <!-- Top Bar -->
+  <div id="topBar">
+    <div class="top-brand">
+      <div class="top-logo-box">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M12 2a5 5 0 0 1 5 5v3H7V7a5 5 0 0 1 5-5z"/>
+          <path d="M8.5 18l3.5 3 3.5-3M12 10v10"/>
+        </svg>
+      </div>
+      <span class="top-name">Chef's Companion</span>
+    </div>
+    <div class="top-right">
+      <div class="region-toggle">
+        <button class="region-btn active" id="btnAUS" onclick="setRegion('AUS')">
+          <span class="flag">🇦🇺</span> AUS
+        </button>
+        <button class="region-btn" id="btnUS" onclick="setRegion('US')">
+          <span class="flag">🇺🇸</span> US
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- ── SCAN SCREEN ── -->
+    <div class="screen active" id="scanScreen">
+
+      <div class="cam-hero" id="camHero">
+        <input type="file" id="fileInput" accept="image/*" capture="environment">
+        <div class="cam-inner">
+          <div class="cam-rings">
+            <div class="cam-ring r1"></div>
+            <div class="cam-ring r2"></div>
+            <div class="cam-circle">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="cam-title">Snap or upload a recipe</div>
+          <div class="cam-sub">Tap to use camera · JPG · PNG · HEIC</div>
+        </div>
+      </div>
+
+      <div class="photo-prev" id="photoPrev">
+        <img id="prevImg" src="" alt="">
+        <div class="photo-prev-bar">
+          <div class="photo-prev-info">Photo ready to scan</div>
+          <button class="btn-remove" onclick="clearPhoto()">Remove</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hd">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          <span class="card-hd-title">Or paste recipe text</span>
+        </div>
+        <textarea class="recipe-ta" id="recipeText"
+          placeholder="2 cups plain flour&#10;1 tbsp butter · 3 eggs&#10;½ cup caster sugar&#10;…&#10;&#10;AUS tbsp = 20ml ✓"></textarea>
+      </div>
+
+      <div class="err-card" id="errCard">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="errText"></span>
+      </div>
+
+      <button class="btn-scan" id="scanBtn" disabled onclick="runScan()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+        </svg>
+        Extract &amp; Convert — <span id="scanBtnRegion">AUS Standard</span>
+      </button>
+    </div>
+
+    <!-- ── RESULT SCREEN ── -->
+    <div class="screen" id="resultScreen">
+
+      <div class="result-hdr">
+        <div class="result-eyebrow">Converted Recipe</div>
+        <div class="result-name" id="rName">—</div>
+        <div class="result-servings" id="rServings"></div>
+      </div>
+
+      <!-- Scaler -->
+      <div class="scaler-card">
+        <div class="scaler-top">
+          <span class="scaler-lbl">Scale Recipe</span>
+          <span class="scaler-big" id="scaleVal">1×</span>
+        </div>
+        <div class="scaler-row">
+          <div class="stepper">
+            <button class="step-b" onclick="nudge(-0.5)">−</button>
+            <div class="step-div"></div>
+            <button class="step-b" onclick="nudge(0.5)">+</button>
+          </div>
+          <div class="q-pills">
+            <button class="q-p on" onclick="setScale(1)">1×</button>
+            <button class="q-p" onclick="setScale(2)">2×</button>
+            <button class="q-p" onclick="setScale(3)">3×</button>
+            <button class="q-p" onclick="setScale(4)">4×</button>
+            <button class="q-p" onclick="setScale(5)">5×</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust -->
+      <div class="trust">
+        <div class="trust-icon">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="trust-body">
+          <div class="trust-txt">Averaged from <strong id="srcCnt">4</strong> verified <span id="trustRegionLabel">Australian</span> sources</div>
+          <div class="src-pills" id="srcBadges"></div>
+          <div id="trustMeasurements" style="font-size:0.6rem;color:var(--ink-45);margin-top:5px">1 cup = 250ml · 1 tbsp = 20ml (AUS)</div>
+        </div>
+      </div>
+
+      <!-- Ingredients -->
+      <div class="sec">
+        <div class="sec-hd">
+          <div class="sec-hd-l">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+              <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+              <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+            <span>Ingredients</span>
+          </div>
+          <div class="sec-chip" id="ingCnt">—</div>
+        </div>
+        <div id="ingList"></div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="sec" id="stepsBlock" style="display:none">
+        <div class="sec-hd">
+          <div class="sec-hd-l">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <span>Method</span>
+          </div>
+        </div>
+        <div id="stepsList"></div>
+      </div>
+
+      <!-- ── NOTES SECTION ── -->
+      <div class="sec">
+        <div class="sec-hd">
+          <div class="sec-hd-l">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            <span>Notes</span>
+          </div>
+          <div class="sec-chip" id="notesCnt">0</div>
+        </div>
+
+        <div class="notes-add-area">
+          <div class="notes-ta-wrap">
+            <textarea class="notes-ta" id="notesInput" maxlength="500"
+              placeholder="Add a note about this recipe… e.g. 'Add extra vanilla next time' or 'Made for Christmas 2024, everyone loved it!'"></textarea>
+          </div>
+          <div class="notes-add-row">
+            <span class="notes-char-count" id="noteCharCount">0 / 500</span>
+            <button class="btn-add-note" id="btnAddNote" onclick="addNote()" disabled>
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Note
+            </button>
+          </div>
+        </div>
+
+        <div class="notes-list" id="notesList"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="btn-row" style="margin-bottom:8px">
+        <button class="btn" onclick="doCopy()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copy
+        </button>
+        <button class="btn" onclick="saveRecipe()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save
+        </button>
+        <button class="btn primary" onclick="goScan()">+ New</button>
+      </div>
+
+    </div><!-- /result -->
+
+    <!-- ── SAVED SCREEN ── -->
+    <div class="screen" id="savedScreen">
+      <div id="savedContent"></div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom Nav -->
+  <div id="bottomNav">
+    <button class="nav-tab active" id="navScan" onclick="showScreen('scan')">
+      <div class="nav-icon-wrap">
+        <div class="nav-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+      </div>
+      <span class="nav-lbl">Scan</span>
+    </button>
+    <button class="nav-tab" id="navResult" onclick="showScreen('result')" style="opacity:0.38;pointer-events:none">
+      <div class="nav-icon-wrap">
+        <div class="nav-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </div>
+      </div>
+      <span class="nav-lbl">Recipe</span>
+    </button>
+    <button class="nav-tab" id="navSaved" onclick="showScreen('saved')">
+      <div class="nav-icon-wrap">
+        <div class="nav-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="nav-badge" id="savedBadge"></div>
+      </div>
+      <span class="nav-lbl">Saved</span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- Loading overlay -->
+<div id="loadOverlay">
+  <div class="ld-spinner">
+    <div class="ld-ring"></div>
+    <div class="ld-ring-i"></div>
+  </div>
+  <div class="ld-title" id="ldTitle">Reading your recipe…</div>
+  <div class="ld-sub" id="ldSub">Cross-referencing Australian sources</div>
+  <div class="ld-chips" id="ldChips"></div>
+</div>
+
+<!-- Install banner -->
+<div id="installBanner">
+  <div class="install-txt">
+    <strong>Add to Home Screen</strong>
+    Install for the full native app experience
+  </div>
+  <button class="btn-inst" onclick="doInstall()">Install</button>
+  <button class="btn-inst-x" onclick="dismissInstall()">✕</button>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// PWA SETUP
+// ══════════════════════════════════════════════════════
+const MANIFEST = {
+  name:"Chef's Companion",short_name:"Chef's",
+  description:"Australian Recipe Scanner & Gram Converter",
+  start_url:".",display:"standalone",orientation:"portrait-primary",
+  background_color:"#F6F1E9",theme_color:"#1B3A2B",
+  icons:[
+    {src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='44' fill='%231B3A2B'/><text x='96' y='130' font-size='96' text-anchor='middle'>🍳</text></svg>",sizes:"192x192",type:"image/svg+xml"},
+    {src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%231B3A2B'/><text x='256' y='345' font-size='270' text-anchor='middle'>🍳</text></svg>",sizes:"512x512",type:"image/svg+xml"}
+  ]
+};
+const mBlob = new Blob([JSON.stringify(MANIFEST)],{type:'application/json'});
+const mLink = document.createElement('link');
+mLink.rel='manifest'; mLink.href=URL.createObjectURL(mBlob);
+document.head.appendChild(mLink);
+
+if('serviceWorker' in navigator){
+  const sw=`const C='cc-v2';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600&display=swap']).catch(()=>{})));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});self.addEventListener('fetch',e=>{if(e.request.url.includes('anthropic.com'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('',{status:503}))));});`;
+  const swBlob=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+}
+
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  setTimeout(()=>document.getElementById('installBanner').classList.add('on'),3500);
+});
+function doInstall(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>dismissInstall());}}
+function dismissInstall(){document.getElementById('installBanner').classList.remove('on');deferredPrompt=null;}
+
+// ══════════════════════════════════════════════════════
+// AUSTRALIAN CONVERSION DATABASE
+// FSANZ · AWW · taste.com.au · Woolworths
+// AUS cup=250ml · AUS tbsp=20ml
+// ══════════════════════════════════════════════════════
+const AUS_DB = {
+  "plain flour":         {fsanz:150,aww:150,taste:150,wool:150},
+  "flour":               {fsanz:150,aww:150,taste:150,wool:150},
+  "all purpose flour":   {fsanz:150,aww:150,taste:150,wool:150},
+  "self raising flour":  {fsanz:150,aww:150,taste:150,wool:150},
+  "self-raising flour":  {fsanz:150,aww:150,taste:150,wool:150},
+  "wholemeal flour":     {fsanz:160,aww:160,taste:158,wool:160},
+  "whole wheat flour":   {fsanz:160,aww:160,taste:158,wool:160},
+  "bread flour":         {fsanz:160,aww:160,taste:158,wool:158},
+  "rye flour":           {fsanz:120,aww:120,taste:118,wool:120},
+  "rice flour":          {fsanz:160,aww:158,taste:160,wool:160},
+  "cornflour":           {fsanz:120,aww:120,taste:118,wool:120},
+  "cornstarch":          {fsanz:120,aww:120,taste:118,wool:120},
+  "almond flour":        {fsanz:120,aww:120,taste:112,wool:116},
+  "almond meal":         {fsanz:120,aww:120,taste:112,wool:116},
+  "chickpea flour":      {fsanz:120,aww:115,taste:118,wool:118},
+  "besan":               {fsanz:120,aww:115,taste:118,wool:118},
+  "tapioca flour":       {fsanz:130,aww:128,taste:130,wool:130},
+  "coconut flour":       {fsanz:112,aww:110,taste:110,wool:112},
+  "caster sugar":        {fsanz:220,aww:220,taste:225,wool:220},
+  "castor sugar":        {fsanz:220,aww:220,taste:225,wool:220},
+  "white sugar":         {fsanz:220,aww:220,taste:220,wool:220},
+  "granulated sugar":    {fsanz:220,aww:220,taste:220,wool:220},
+  "sugar":               {fsanz:220,aww:220,taste:220,wool:220},
+  "brown sugar":         {fsanz:220,aww:215,taste:218,wool:220},
+  "raw sugar":           {fsanz:225,aww:220,taste:222,wool:225},
+  "demerara sugar":      {fsanz:220,aww:220,taste:220,wool:218},
+  "icing sugar":         {fsanz:160,aww:160,taste:155,wool:158},
+  "icing sugar mixture": {fsanz:155,aww:155,taste:150,wool:155},
+  "pure icing sugar":    {fsanz:160,aww:160,taste:155,wool:158},
+  "muscovado sugar":     {fsanz:215,aww:210,taste:212,wool:215},
+  "coconut sugar":       {fsanz:200,aww:195,taste:200,wool:198},
+  "water":               {fsanz:250,aww:250,taste:250,wool:250},
+  "milk":                {fsanz:255,aww:250,taste:255,wool:253},
+  "full cream milk":     {fsanz:255,aww:250,taste:255,wool:253},
+  "skim milk":           {fsanz:253,aww:250,taste:253,wool:252},
+  "buttermilk":          {fsanz:250,aww:250,taste:248,wool:250},
+  "cream":               {fsanz:250,aww:250,taste:250,wool:250},
+  "thickened cream":     {fsanz:250,aww:250,taste:248,wool:250},
+  "double cream":        {fsanz:255,aww:255,taste:255,wool:255},
+  "sour cream":          {fsanz:260,aww:255,taste:258,wool:260},
+  "yoghurt":             {fsanz:265,aww:260,taste:263,wool:265},
+  "coconut milk":        {fsanz:250,aww:248,taste:250,wool:250},
+  "coconut cream":       {fsanz:258,aww:255,taste:258,wool:258},
+  "olive oil":           {fsanz:220,aww:220,taste:215,wool:218},
+  "oil":                 {fsanz:220,aww:220,taste:215,wool:218},
+  "vegetable oil":       {fsanz:220,aww:220,taste:215,wool:218},
+  "canola oil":          {fsanz:218,aww:218,taste:215,wool:218},
+  "honey":               {fsanz:350,aww:345,taste:350,wool:348},
+  "golden syrup":        {fsanz:350,aww:355,taste:352,wool:350},
+  "maple syrup":         {fsanz:325,aww:320,taste:323,wool:325},
+  "treacle":             {fsanz:360,aww:355,taste:358,wool:360},
+  "molasses":            {fsanz:355,aww:350,taste:355,wool:355},
+  "vinegar":             {fsanz:250,aww:250,taste:250,wool:250},
+  "butter":              {fsanz:250,aww:250,taste:250,wool:250},
+  "unsalted butter":     {fsanz:250,aww:250,taste:250,wool:250},
+  "salted butter":       {fsanz:250,aww:250,taste:250,wool:250},
+  "margarine":           {fsanz:240,aww:240,taste:238,wool:240},
+  "ghee":                {fsanz:230,aww:228,taste:230,wool:230},
+  "lard":                {fsanz:230,aww:228,taste:230,wool:230},
+  "coconut oil":         {fsanz:230,aww:228,taste:228,wool:230},
+  "baking powder":       {fsanz:5,aww:5,taste:5,wool:5,_unit:"tsp"},
+  "bicarbonate of soda": {fsanz:6,aww:6,taste:6,wool:6,_unit:"tsp"},
+  "bicarb soda":         {fsanz:6,aww:6,taste:6,wool:6,_unit:"tsp"},
+  "baking soda":         {fsanz:6,aww:6,taste:6,wool:6,_unit:"tsp"},
+  "cocoa powder":        {fsanz:100,aww:100,taste:95,wool:98},
+  "dutch cocoa":         {fsanz:100,aww:100,taste:95,wool:98},
+  "cacao powder":        {fsanz:100,aww:100,taste:95,wool:98},
+  "salt":                {fsanz:6,aww:6,taste:6,wool:6,_unit:"tsp"},
+  "sea salt":            {fsanz:5,aww:5,taste:5,wool:5,_unit:"tsp"},
+  "white rice":          {fsanz:200,aww:200,taste:195,wool:198},
+  "basmati rice":        {fsanz:200,aww:198,taste:195,wool:198},
+  "jasmine rice":        {fsanz:200,aww:198,taste:195,wool:198},
+  "brown rice":          {fsanz:190,aww:190,taste:188,wool:190},
+  "arborio rice":        {fsanz:205,aww:200,taste:205,wool:205},
+  "rolled oats":         {fsanz:90,aww:90,taste:85,wool:88},
+  "oats":                {fsanz:90,aww:90,taste:85,wool:88},
+  "quick oats":          {fsanz:90,aww:88,taste:85,wool:88},
+  "couscous":            {fsanz:175,aww:180,taste:178,wool:175},
+  "quinoa":              {fsanz:185,aww:180,taste:185,wool:183},
+  "polenta":             {fsanz:170,aww:168,taste:170,wool:170},
+  "semolina":            {fsanz:170,aww:168,taste:170,wool:170},
+  "breadcrumbs":         {fsanz:120,aww:120,taste:115,wool:118},
+  "panko":               {fsanz:65,aww:63,taste:65,wool:64},
+  "almonds":             {fsanz:145,aww:140,taste:145,wool:143},
+  "flaked almonds":      {fsanz:85,aww:80,taste:83,wool:83},
+  "cashews":             {fsanz:150,aww:145,taste:150,wool:148},
+  "walnuts":             {fsanz:105,aww:100,taste:105,wool:103},
+  "macadamia nuts":      {fsanz:145,aww:140,taste:143,wool:143},
+  "peanuts":             {fsanz:150,aww:145,taste:148,wool:148},
+  "pine nuts":           {fsanz:145,aww:140,taste:143,wool:143},
+  "pistachios":          {fsanz:120,aww:120,taste:118,wool:120},
+  "hazelnuts":           {fsanz:135,aww:130,taste:133,wool:133},
+  "pecans":              {fsanz:110,aww:105,taste:108,wool:108},
+  "peanut butter":       {fsanz:260,aww:255,taste:260,wool:258},
+  "sesame seeds":        {fsanz:150,aww:148,taste:150,wool:150},
+  "chia seeds":          {fsanz:165,aww:162,taste:165,wool:165},
+  "flaxseed":            {fsanz:155,aww:152,taste:155,wool:155},
+  "sunflower seeds":     {fsanz:140,aww:138,taste:140,wool:140},
+  "pepitas":             {fsanz:130,aww:128,taste:130,wool:130},
+  "desiccated coconut":  {fsanz:90,aww:85,taste:90,wool:88},
+  "shredded coconut":    {fsanz:80,aww:78,taste:80,wool:80},
+  "coconut flakes":      {fsanz:55,aww:53,taste:55,wool:55},
+  "grated cheddar":      {fsanz:120,aww:120,taste:115,wool:118},
+  "cheddar cheese":      {fsanz:120,aww:120,taste:115,wool:118},
+  "parmesan":            {fsanz:100,aww:95,taste:100,wool:98},
+  "grated parmesan":     {fsanz:100,aww:95,taste:100,wool:98},
+  "mozzarella":          {fsanz:115,aww:110,taste:113,wool:113},
+  "ricotta":             {fsanz:260,aww:255,taste:260,wool:258},
+  "cream cheese":        {fsanz:240,aww:238,taste:240,wool:240},
+  "lentils dry":         {fsanz:200,aww:198,taste:200,wool:200},
+  "chickpeas dry":       {fsanz:195,aww:190,taste:193,wool:193},
+  "cooked chickpeas":    {fsanz:170,aww:168,taste:170,wool:170},
+  "chocolate chips":     {fsanz:175,aww:173,taste:175,wool:175},
+  "choc chips":          {fsanz:175,aww:173,taste:175,wool:175},
+  "yeast":               {fsanz:9,aww:9,taste:9,wool:9,_unit:"tsp"},
+  "dried yeast":         {fsanz:9,aww:9,taste:9,wool:9,_unit:"tsp"},
+  "vanilla extract":     {fsanz:5,aww:5,taste:5,wool:5,_unit:"tsp"},
+  "vanilla essence":     {fsanz:5,aww:5,taste:5,wool:5,_unit:"tsp"},
+  "cinnamon":            {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "cumin":               {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "turmeric":            {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "paprika":             {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "cayenne":             {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "black pepper":        {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "mixed spice":         {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "nutmeg":              {fsanz:3,aww:3,taste:3,wool:3,_unit:"tsp"},
+  "cream of tartar":     {fsanz:4,aww:4,taste:4,wool:4,_unit:"tsp"},
+};
+
+// ══════════════════════════════════════════════════════
+// US CONVERSION DATABASE
+// Sources: King Arthur Baking (kab), America's Test Kitchen (atk),
+//          USDA FoodData Central (usda), AllRecipes (ar)
+// US cup = 240ml · US tbsp = 15ml · US tsp = 5ml
+// ══════════════════════════════════════════════════════
+const US_DB = {
+  // ── FLOURS ──
+  "plain flour":         {kab:120,atk:125,usda:125,ar:125},
+  "flour":               {kab:120,atk:125,usda:125,ar:125},
+  "all purpose flour":   {kab:120,atk:125,usda:125,ar:125},
+  "self raising flour":  {kab:120,atk:125,usda:125,ar:124},
+  "self-raising flour":  {kab:120,atk:125,usda:125,ar:124},
+  "bread flour":         {kab:120,atk:130,usda:127,ar:127},
+  "wholemeal flour":     {kab:113,atk:120,usda:120,ar:120},
+  "whole wheat flour":   {kab:113,atk:120,usda:120,ar:120},
+  "rye flour":           {kab:102,atk:100,usda:102,ar:102},
+  "rice flour":          {kab:136,atk:140,usda:158,ar:136},
+  "cornflour":           {kab:120,atk:120,usda:117,ar:118},
+  "cornstarch":          {kab:120,atk:120,usda:117,ar:118},
+  "almond flour":        {kab:96,atk:100,usda:96,ar:96},
+  "almond meal":         {kab:96,atk:100,usda:96,ar:96},
+  "chickpea flour":      {kab:90,atk:92,usda:92,ar:92},
+  "besan":               {kab:90,atk:92,usda:92,ar:92},
+  "tapioca flour":       {kab:120,atk:125,usda:120,ar:120},
+  "coconut flour":       {kab:112,atk:110,usda:112,ar:112},
+  // ── SUGARS ──
+  "white sugar":         {kab:198,atk:200,usda:200,ar:200},
+  "granulated sugar":    {kab:198,atk:200,usda:200,ar:200},
+  "sugar":               {kab:198,atk:200,usda:200,ar:200},
+  "caster sugar":        {kab:198,atk:200,usda:200,ar:198},
+  "castor sugar":        {kab:198,atk:200,usda:200,ar:198},
+  "brown sugar":         {kab:213,atk:220,usda:220,ar:220},
+  "brown sugar packed":  {kab:213,atk:220,usda:220,ar:220},
+  "raw sugar":           {kab:200,atk:200,usda:200,ar:200},
+  "demerara sugar":      {kab:200,atk:200,usda:200,ar:200},
+  "powdered sugar":      {kab:113,atk:115,usda:120,ar:120},
+  "confectioners sugar": {kab:113,atk:115,usda:120,ar:120},
+  "icing sugar":         {kab:113,atk:115,usda:120,ar:120},
+  "pure icing sugar":    {kab:113,atk:115,usda:120,ar:120},
+  "muscovado sugar":     {kab:185,atk:190,usda:190,ar:190},
+  "coconut sugar":       {kab:168,atk:170,usda:168,ar:170},
+  // ── LIQUIDS ──
+  "water":               {kab:227,atk:227,usda:237,ar:240},
+  "milk":                {kab:227,atk:227,usda:244,ar:244},
+  "full cream milk":     {kab:227,atk:227,usda:244,ar:244},
+  "whole milk":          {kab:227,atk:227,usda:244,ar:244},
+  "skim milk":           {kab:227,atk:227,usda:245,ar:245},
+  "buttermilk":          {kab:227,atk:227,usda:245,ar:245},
+  "cream":               {kab:227,atk:238,usda:238,ar:238},
+  "heavy cream":         {kab:227,atk:238,usda:238,ar:238},
+  "sour cream":          {kab:227,atk:240,usda:240,ar:240},
+  "yogurt":              {kab:227,atk:245,usda:245,ar:245},
+  "yoghurt":             {kab:227,atk:245,usda:245,ar:245},
+  "coconut milk":        {kab:227,atk:227,usda:227,ar:240},
+  "coconut cream":       {kab:227,atk:232,usda:232,ar:232},
+  "olive oil":           {kab:198,atk:196,usda:216,ar:216},
+  "oil":                 {kab:198,atk:196,usda:216,ar:216},
+  "vegetable oil":       {kab:198,atk:196,usda:218,ar:218},
+  "canola oil":          {kab:196,atk:196,usda:218,ar:218},
+  "honey":               {kab:340,atk:337,usda:339,ar:339},
+  "golden syrup":        {kab:312,atk:320,usda:315,ar:315},
+  "maple syrup":         {kab:312,atk:315,usda:315,ar:312},
+  "molasses":            {kab:326,atk:328,usda:328,ar:328},
+  "vinegar":             {kab:227,atk:236,usda:239,ar:240},
+  // ── BUTTER & FATS ──
+  "butter":              {kab:227,atk:227,usda:227,ar:227},
+  "unsalted butter":     {kab:227,atk:227,usda:227,ar:227},
+  "salted butter":       {kab:227,atk:227,usda:227,ar:227},
+  "margarine":           {kab:220,atk:220,usda:227,ar:225},
+  "ghee":                {kab:205,atk:205,usda:205,ar:218},
+  "lard":                {kab:205,atk:205,usda:205,ar:205},
+  "coconut oil":         {kab:218,atk:218,usda:218,ar:218},
+  "shortening":          {kab:188,atk:190,usda:190,ar:190},
+  // ── LEAVENERS & POWDERS ──
+  "baking powder":       {kab:4,atk:4,usda:4,ar:4,_unit:"tsp"},
+  "baking soda":         {kab:6,atk:6,usda:6,ar:6,_unit:"tsp"},
+  "bicarbonate of soda": {kab:6,atk:6,usda:6,ar:6,_unit:"tsp"},
+  "bicarb soda":         {kab:6,atk:6,usda:6,ar:6,_unit:"tsp"},
+  "cocoa powder":        {kab:85,atk:90,usda:86,ar:86},
+  "dutch cocoa":         {kab:85,atk:90,usda:86,ar:86},
+  "cacao powder":        {kab:85,atk:90,usda:86,ar:86},
+  "salt":                {kab:6,atk:6,usda:6,ar:6,_unit:"tsp"},
+  "sea salt":            {kab:5,atk:5,usda:5,ar:5,_unit:"tsp"},
+  // ── GRAINS ──
+  "white rice":          {kab:185,atk:185,usda:195,ar:190},
+  "basmati rice":        {kab:185,atk:185,usda:190,ar:185},
+  "brown rice":          {kab:195,atk:195,usda:195,ar:195},
+  "arborio rice":        {kab:200,atk:200,usda:200,ar:200},
+  "rolled oats":         {kab:81,atk:85,usda:81,ar:85},
+  "oats":                {kab:81,atk:85,usda:81,ar:85},
+  "quick oats":          {kab:81,atk:82,usda:81,ar:82},
+  "couscous":            {kab:170,atk:170,usda:173,ar:170},
+  "quinoa":              {kab:170,atk:170,usda:185,ar:170},
+  "polenta":             {kab:155,atk:160,usda:157,ar:157},
+  "cornmeal":            {kab:155,atk:160,usda:157,ar:157},
+  "semolina":            {kab:165,atk:165,usda:167,ar:165},
+  "breadcrumbs":         {kab:108,atk:110,usda:108,ar:108},
+  "panko":               {kab:55,atk:57,usda:55,ar:55},
+  // ── NUTS ──
+  "almonds":             {kab:143,atk:140,usda:143,ar:143},
+  "cashews":             {kab:137,atk:140,usda:137,ar:140},
+  "walnuts":             {kab:100,atk:100,usda:100,ar:100},
+  "peanuts":             {kab:146,atk:146,usda:146,ar:146},
+  "pine nuts":           {kab:136,atk:136,usda:136,ar:136},
+  "pistachios":          {kab:123,atk:120,usda:123,ar:120},
+  "hazelnuts":           {kab:135,atk:132,usda:135,ar:132},
+  "pecans":              {kab:99,atk:100,usda:99,ar:99},
+  "peanut butter":       {kab:258,atk:260,usda:258,ar:258},
+  // ── SEEDS & COCONUT ──
+  "sesame seeds":        {kab:144,atk:144,usda:144,ar:144},
+  "chia seeds":          {kab:160,atk:160,usda:160,ar:160},
+  "flaxseed":            {kab:149,atk:149,usda:149,ar:149},
+  "sunflower seeds":     {kab:140,atk:140,usda:140,ar:140},
+  "pepitas":             {kab:129,atk:130,usda:129,ar:130},
+  "desiccated coconut":  {kab:75,atk:80,usda:80,ar:80},
+  "shredded coconut":    {kab:75,atk:75,usda:75,ar:75},
+  "coconut flakes":      {kab:60,atk:60,usda:60,ar:60},
+  // ── DAIRY ──
+  "cheddar cheese":      {kab:113,atk:113,usda:113,ar:113},
+  "grated cheddar":      {kab:113,atk:113,usda:113,ar:113},
+  "parmesan":            {kab:100,atk:100,usda:100,ar:90},
+  "grated parmesan":     {kab:100,atk:100,usda:100,ar:90},
+  "mozzarella":          {kab:113,atk:113,usda:113,ar:113},
+  "ricotta":             {kab:246,atk:250,usda:246,ar:246},
+  "cream cheese":        {kab:225,atk:227,usda:232,ar:232},
+  // ── LEGUMES ──
+  "lentils dry":         {kab:192,atk:195,usda:192,ar:192},
+  "chickpeas dry":       {kab:200,atk:200,usda:200,ar:200},
+  "cooked chickpeas":    {kab:164,atk:164,usda:164,ar:164},
+  // ── CHOCOLATE ──
+  "chocolate chips":     {kab:170,atk:175,usda:170,ar:170},
+  "choc chips":          {kab:170,atk:175,usda:170,ar:170},
+  // ── SPICES (per tsp) ──
+  "yeast":               {kab:9,atk:9,usda:9,ar:9,_unit:"tsp"},
+  "dried yeast":         {kab:9,atk:9,usda:9,ar:9,_unit:"tsp"},
+  "vanilla extract":     {kab:4,atk:4,usda:4,ar:4,_unit:"tsp"},
+  "vanilla essence":     {kab:4,atk:4,usda:4,ar:4,_unit:"tsp"},
+  "cinnamon":            {kab:3,atk:3,usda:3,ar:3,_unit:"tsp"},
+  "cumin":               {kab:3,atk:3,usda:2,ar:2,_unit:"tsp"},
+  "turmeric":            {kab:3,atk:3,usda:3,ar:3,_unit:"tsp"},
+  "paprika":             {kab:2,atk:2,usda:2,ar:2,_unit:"tsp"},
+  "cayenne":             {kab:2,atk:2,usda:2,ar:2,_unit:"tsp"},
+  "black pepper":        {kab:2,atk:2,usda:2,ar:2,_unit:"tsp"},
+  "mixed spice":         {kab:2,atk:2,usda:2,ar:2,_unit:"tsp"},
+  "nutmeg":              {kab:2,atk:2,usda:2,ar:2,_unit:"tsp"},
+  "cream of tartar":     {kab:3,atk:3,usda:3,ar:3,_unit:"tsp"},
+};
+
+// ── Region config ──
+const REGION_CONFIG = {
+  AUS: {
+    name:'Australian', flag:'🇦🇺', label:'AUS',
+    cup:250, tbsp:20, tsp:5,
+    db: AUS_DB,
+    srcKeys:['fsanz','aww','taste','wool'],
+    srcDefaultLabels:['FSANZ','AWW','taste.com.au','Woolworths'],
+    srcLabels:{fsanz:'FSANZ',aww:'AWW',taste:'taste',wool:'Wool.',woolworths:'Wool.',web:'web',est:'est.'},
+    srcCls:{fsanz:'fsanz',aww:'aww',taste:'taste',wool:'woolworths',woolworths:'woolworths',web:'web',est:'est'},
+    measureLine:'1 cup = 250ml · 1 tbsp = 20ml (AUS)',
+    scanLabel:'AUS Standard',
+    loadMsgs:[
+      ["Reading your recipe…","Extracting ingredients"],
+      ["Checking FSANZ database…","Food Standards Australia New Zealand"],
+      ["Cross-referencing AWW…","Australian Women's Weekly"],
+      ["Verifying taste.com.au…","Australia's #1 recipe platform"],
+      ["Averaging sources…","Multi-source accuracy check"],
+      ["Converting to grams…","AUS: cup=250ml · tbsp=20ml"],
+      ["Almost ready…","Finalising"],
+    ],
+    loadChips:['FSANZ','AWW','taste.com.au','Woolworths'],
+  },
+  US: {
+    name:'American', flag:'🇺🇸', label:'US',
+    cup:240, tbsp:15, tsp:5,
+    db: US_DB,
+    srcKeys:['kab','atk','usda','ar'],
+    srcDefaultLabels:['King Arthur','ATK','USDA','AllRecipes'],
+    srcLabels:{kab:'KAB',atk:'ATK',usda:'USDA',ar:'AR',web:'web',est:'est.'},
+    srcCls:{kab:'fsanz',atk:'aww',usda:'taste',ar:'woolworths',web:'web',est:'est'},
+    measureLine:'1 cup = 240ml · 1 tbsp = 15ml (US)',
+    scanLabel:'US Standard',
+    loadMsgs:[
+      ["Reading your recipe…","Extracting ingredients"],
+      ["Checking King Arthur Baking…","America's most trusted baking source"],
+      ["Cross-referencing ATK…","America's Test Kitchen"],
+      ["Verifying USDA data…","USDA FoodData Central"],
+      ["Averaging sources…","Multi-source accuracy check"],
+      ["Converting to grams…","US: cup=240ml · tbsp=15ml"],
+      ["Almost ready…","Finalising"],
+    ],
+    loadChips:['King Arthur','ATK','USDA','AllRecipes'],
+  }
+};
+let photoB64=null, photoMime=null;
+let recipe=null, scale=1;
+let loadInterval=null;
+let region = localStorage.getItem('cc_region') || 'AUS';
+let saved = JSON.parse(localStorage.getItem('cc_saved')||'[]');
+// notes: { [recipeKey]: [{id, text, date, time}] }
+let notes = JSON.parse(localStorage.getItem('cc_notes')||'{}');
+
+// ── Inputs ──
+document.getElementById('fileInput').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const [h,b]=ev.target.result.split(',');
+    photoB64=b; photoMime=h.match(/:(.*?);/)?.[1]||'image/jpeg';
+    document.getElementById('prevImg').src=ev.target.result;
+    document.getElementById('camHero').style.display='none';
+    document.getElementById('photoPrev').classList.add('on');
+    checkReady();
+    if(navigator.vibrate) navigator.vibrate(25);
+  };
+  r.readAsDataURL(f);
+});
+document.getElementById('recipeText').addEventListener('input',checkReady);
+
+// Notes textarea char count
+const notesInput = document.getElementById('notesInput');
+notesInput.addEventListener('input',()=>{
+  const len = notesInput.value.length;
+  document.getElementById('noteCharCount').textContent = len+' / 500';
+  document.getElementById('btnAddNote').disabled = len < 1;
+});
+
+function clearPhoto(){
+  photoB64=null; photoMime=null;
+  document.getElementById('fileInput').value='';
+  document.getElementById('photoPrev').classList.remove('on');
+  document.getElementById('camHero').style.display='';
+  checkReady();
+}
+function checkReady(){
+  const ok=!!photoB64||document.getElementById('recipeText').value.trim().length>10;
+  document.getElementById('scanBtn').disabled=!ok;
+}
+
+// ── Navigation ──
+function showScreen(name){
+  if(name==='result'&&!recipe) return;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(name+'Screen').classList.add('active');
+  document.getElementById('nav'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
+  document.getElementById('content').scrollTop=0;
+  if(name==='saved') renderSaved();
+}
+function enableResultTab(){
+  const b=document.getElementById('navResult');
+  b.style.opacity='1'; b.style.pointerEvents='';
+}
+function goScan(){ showScreen('scan'); }
+
+// ── Region toggle ──
+function setRegion(r){
+  region = r;
+  localStorage.setItem('cc_region', r);
+  const cfg = REGION_CONFIG[r];
+  // toggle buttons
+  document.getElementById('btnAUS').classList.toggle('active', r==='AUS');
+  document.getElementById('btnUS').classList.toggle('active', r==='US');
+  // scan button label
+  document.getElementById('scanBtnRegion').textContent = cfg.scanLabel;
+  // textarea placeholder
+  document.getElementById('recipeText').placeholder =
+    r === 'AUS'
+      ? '2 cups plain flour\n1 tbsp butter · 3 eggs\n½ cup caster sugar\n…\n\nAUS tbsp = 20ml ✓'
+      : '2 cups all purpose flour\n1 tbsp butter · 3 eggs\n½ cup sugar\n…\n\nUS tbsp = 15ml';
+  // trust bar measurements line
+  const tm = document.getElementById('trustMeasurements');
+  if(tm) tm.textContent = cfg.measureLine;
+  const tl = document.getElementById('trustRegionLabel');
+  if(tl) tl.textContent = cfg.name;
+  // if a recipe is showing, refresh the trust badges
+  if(recipe) buildBadges(recipe.sourcesUsed||[]);
+  if(navigator.vibrate) navigator.vibrate(15);
+  showToast((r==='AUS'?'🇦🇺':'🇺🇸')+' Switched to '+cfg.name+' measurements');
+}
+
+// ── Scan ──
+async function runScan(){
+  hideErr();
+  const cfg = REGION_CONFIG[region];
+  document.getElementById('loadOverlay').classList.add('on');
+  document.getElementById('scanBtn').disabled=true;
+  document.getElementById('ldChips').innerHTML='';
+  if(navigator.vibrate) navigator.vibrate([15,20,15]);
+
+  let li=0, ci=0;
+  loadInterval=setInterval(()=>{
+    const [t,s]=cfg.loadMsgs[li%cfg.loadMsgs.length];
+    document.getElementById('ldTitle').textContent=t;
+    document.getElementById('ldSub').textContent=s;
+    li++;
+    if(ci<cfg.loadChips.length){
+      const el=document.createElement('div');
+      el.className='ld-chip'; el.textContent='✓ '+cfg.loadChips[ci];
+      el.style.animationDelay='0s';
+      document.getElementById('ldChips').appendChild(el);
+      ci++;
+    }
+  },1500);
+
+  try{
+    const dbCtx=Object.entries(cfg.db).map(([k,v])=>{
+      const s=cfg.srcKeys.filter(x=>v[x]!=null);
+      return `${k}: ${Math.round(s.reduce((a,x)=>a+v[x],0)/s.length)}g per ${v._unit||'cup'}`;
+    }).join('\n');
+
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:1000,
+        system:buildSys(dbCtx),
+        tools:[{type:"web_search_20250305",name:"web_search"}],
+        messages:[{role:"user",content:buildContent()}]
+      })
+    });
+    clearInterval(loadInterval);
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const clean=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    const json=JSON.parse(clean.slice(clean.indexOf('{'),clean.lastIndexOf('}')+1));
+    // stamp which region this recipe was scanned with
+    json._region = region;
+
+    recipe=json; scale=1;
+    renderRecipe();
+    enableResultTab();
+    document.getElementById('loadOverlay').classList.remove('on');
+    showScreen('result');
+    if(navigator.vibrate) navigator.vibrate([25,15,50]);
+
+  }catch(err){
+    clearInterval(loadInterval);
+    document.getElementById('loadOverlay').classList.remove('on');
+    showErr(err.message||"Something went wrong. Please try again.");
+    document.getElementById('scanBtn').disabled=false;
+  }
+}
+
+function buildSys(db){
+  const cfg = REGION_CONFIG[region];
+  const r = region === 'AUS'
+    ? `Australian recipe assistant. AUS: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml, 1 tsp=${cfg.tsp}ml.`
+    : `American recipe assistant. US: 1 cup=${cfg.cup}ml, 1 tbsp=${cfg.tbsp}ml, 1 tsp=${cfg.tsp}ml.`;
+  const srcList = cfg.srcDefaultLabels.join(', ');
+  const webSearch = region === 'AUS'
+    ? 'web_search for AUS gram value from 2+ sources (FSANZ, taste.com.au, AWW, Woolworths) and average'
+    : 'web_search for US gram value from 2+ sources (King Arthur Baking, ATK, USDA, AllRecipes) and average';
+  const exampleSources = JSON.stringify(cfg.srcKeys);
+  const exampleSrcVals = cfg.srcKeys.map(()=>150).join(',');
+  return `You are Chef's Companion, ${r}
+DATABASE (${cfg.name} sources: ${srcList}):
+${db}
+Extract ALL ingredients. Lookup in DB. If missing, ${webSearch}.
+Whole items (eggs,cloves) → isCount:true.
+Return ONLY JSON:
+{"title":"Name","servings":"serves 4","ingredients":[{"name":"plain flour","grams":300,"originalQty":"2 cups","note":"sifted","sources":${exampleSources},"sourceValues":[${exampleSrcVals}],"isCount":false}],"instructions":["Step 1"],"sourcesUsed":${JSON.stringify(cfg.srcDefaultLabels)}}`;
+}
+function buildContent(){
+  const cfg = REGION_CONFIG[region];
+  const text=document.getElementById('recipeText').value.trim();
+  const hint = `${region}: 1cup=${cfg.cup}ml, 1tbsp=${cfg.tbsp}ml`;
+  if(photoB64) return [
+    {type:"image",source:{type:"base64",media_type:photoMime,data:photoB64}},
+    {type:"text",text:text?`Recipe image. Context: ${text}`:`Extract recipe. Convert all to grams (${hint}).`}
+  ];
+  return `Extract recipe from this text, convert to grams (${hint}):\n\n${text}`;
+}
+
+// ── Render Recipe ──
+function renderRecipe(){
+  document.getElementById('rName').textContent=recipe.title||'Recipe';
+  document.getElementById('rServings').textContent=recipe.servings?`Base: ${recipe.servings}`:'';
+  const s=new Set(); (recipe.ingredients||[]).forEach(i=>(i.sources||[]).forEach(x=>s.add(x)));
+  document.getElementById('srcCnt').textContent=s.size||'4';
+  document.getElementById('ingCnt').textContent=(recipe.ingredients||[]).length+' items';
+  buildBadges(recipe.sourcesUsed||[]);
+  updateScaleDisplay();
+  renderIngredients();
+  renderInstructions();
+  renderNotes();
+}
+function buildBadges(list){
+  const el=document.getElementById('srcBadges'); el.innerHTML='';
+  const cfg = REGION_CONFIG[recipe?._region||region];
+  const defaults = cfg ? cfg.srcDefaultLabels : REGION_CONFIG.AUS.srcDefaultLabels;
+  (list.length?list:defaults).forEach(s=>{
+    const sl = s.toLowerCase();
+    let c = 'web';
+    if(sl.includes('fsanz')||sl.includes('food standards')) c='fsanz';
+    else if(sl.includes('aww')||sl.includes('women')) c='aww';
+    else if(sl.includes('taste')) c='taste';
+    else if(sl.includes('wool')) c='woolworths';
+    else if(sl.includes('king arthur')||sl.includes('kab')) c='fsanz';
+    else if(sl.includes('atk')||sl.includes("test kitchen")) c='aww';
+    else if(sl.includes('usda')) c='taste';
+    else if(sl.includes('allrecipes')||sl.includes('ar')) c='woolworths';
+    el.innerHTML+=`<span class="src-b ${c}">✓ ${s}</span>`;
+  });
+  // Update measurements line for recipe's region
+  const tm=document.getElementById('trustMeasurements');
+  if(tm && cfg) tm.textContent=cfg.measureLine;
+  const tl=document.getElementById('trustRegionLabel');
+  if(tl && cfg) tl.textContent=cfg.name;
+}
+function renderIngredients(){
+  const list=document.getElementById('ingList'); list.innerHTML='';
+  const recipeCfg = REGION_CONFIG[recipe?._region||region]||REGION_CONFIG.AUS;
+  (recipe?.ingredients||[]).forEach(ing=>{
+    const g=Math.round((ing.grams||0)*scale*10)/10;
+    const row=document.createElement('div'); row.className='ing-row';
+    const sr=ing.sources||['est'],vl=ing.sourceValues||[];
+    const pillsHtml=sr.slice(0,2).map((s,i)=>{
+      const c = recipeCfg.srcCls[s] || (s==='web'?'web':'est');
+      const lb = recipeCfg.srcLabels[s] || s.toUpperCase().slice(0,5);
+      return `<span class="src-dot ${c}" title="${vl[i]?vl[i]+'g':s}">${lb}</span>`;
+    }).join('');
+    row.innerHTML=`
+      <div class="ing-g"><div class="g-n">${fmtG(g)}</div><div class="g-l">${ing.isCount?'count':'grams'}</div></div>
+      <div class="ing-sep"></div>
+      <div class="ing-body">
+        <div class="i-nm">${ing.name}</div>
+        ${ing.originalQty?`<div class="i-orig">${scOrig(ing.originalQty,scale)}</div>`:''}
+        ${ing.note?`<div class="i-note">${ing.note}</div>`:''}
+      </div>
+      <div class="ing-srcs">${pillsHtml}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+function renderInstructions(){
+  const bl=document.getElementById('stepsBlock'),li=document.getElementById('stepsList');
+  li.innerHTML='';
+  if(!recipe?.instructions?.length){bl.style.display='none';return;}
+  bl.style.display='';
+  recipe.instructions.forEach((step,i)=>{
+    const d=document.createElement('div'); d.className='step-row';
+    d.innerHTML=`<div class="step-n">${String(i+1).padStart(2,'0')}</div><div class="step-t">${step}</div>`;
+    li.appendChild(d);
+  });
+}
+
+// ── NOTES ──
+function noteKey(){
+  return recipe ? (recipe.title||'unnamed').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'') : null;
+}
+function renderNotes(){
+  const key=noteKey(); if(!key) return;
+  const list=notes[key]||[];
+  const el=document.getElementById('notesList');
+  el.innerHTML='';
+  document.getElementById('notesCnt').textContent=list.length;
+  if(!list.length){
+    el.innerHTML='<div class="notes-empty">No notes yet. Add your first one above.</div>';
+    return;
+  }
+  list.forEach((n,i)=>{
+    const d=document.createElement('div'); d.className='note-item';
+    d.innerHTML=`
+      <div class="note-meta">
+        <div class="note-date-wrap">
+          <div class="note-date-icon">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <span class="note-date">${n.date}</span>
+          <span class="note-time">${n.time}</span>
+        </div>
+        <button class="btn-del-note" onclick="deleteNote(${i})" title="Delete note">✕</button>
+      </div>
+      <div class="note-text">${escHtml(n.text)}</div>
+    `;
+    el.appendChild(d);
+  });
+}
+function addNote(){
+  const key=noteKey(); if(!key) return;
+  const text=notesInput.value.trim(); if(!text) return;
+  const now=new Date();
+  const date=now.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  const time=now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  if(!notes[key]) notes[key]=[];
+  notes[key].unshift({id:Date.now(),text,date,time});
+  localStorage.setItem('cc_notes',JSON.stringify(notes));
+  notesInput.value='';
+  document.getElementById('noteCharCount').textContent='0 / 500';
+  document.getElementById('btnAddNote').disabled=true;
+  renderNotes();
+  // Update saved recipe's note count if it's saved
+  updateSavedNoteCount(key);
+  showToast('✓ Note added');
+  if(navigator.vibrate) navigator.vibrate(20);
+}
+function deleteNote(idx){
+  const key=noteKey(); if(!key) return;
+  if(!confirm('Delete this note?')) return;
+  notes[key].splice(idx,1);
+  if(!notes[key].length) delete notes[key];
+  localStorage.setItem('cc_notes',JSON.stringify(notes));
+  renderNotes();
+  updateSavedNoteCount(key);
+  if(navigator.vibrate) navigator.vibrate(15);
+}
+function updateSavedNoteCount(key){
+  // refresh saved list if visible
+  const sc=document.getElementById('savedScreen');
+  if(sc.classList.contains('active')) renderSaved();
+}
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Scale ──
+function nudge(d){setScale(Math.max(0.25,Math.min(10,scale+d)));}
+function setScale(v){
+  scale=v; updateScaleDisplay(); renderIngredients();
+  document.querySelectorAll('.q-p').forEach(b=>b.classList.toggle('on',parseFloat(b.textContent)===v));
+  if(navigator.vibrate) navigator.vibrate(12);
+}
+function updateScaleDisplay(){
+  document.getElementById('scaleVal').textContent=scale%1===0?`${scale}×`:`${scale.toFixed(1)}×`;
+}
+
+// ── Format ──
+function fmtG(g){
+  if(g>=1000) return (g/1000).toFixed(2).replace(/\.?0+$/,'')+'kg';
+  return g%1===0?g:parseFloat(g.toFixed(1));
+}
+function scOrig(orig,s){
+  if(!orig||s===1) return orig||'';
+  return orig.replace(/(\d+(\.\d+)?\/?\d*)/g,m=>{
+    let n=m.includes('/')?parseFloat(m.split('/')[0])/parseFloat(m.split('/')[1]):parseFloat(m);
+    const sc=n*s; return sc%1===0?sc:(Math.round(sc*4)/4).toFixed(2).replace(/\.?0+$/,'');
+  });
+}
+
+// ── Copy ──
+function doCopy(){
+  if(!recipe) return;
+  const rcfg = REGION_CONFIG[recipe._region||region]||REGION_CONFIG.AUS;
+  let t=`${recipe.title} (${scale}×)\n${'─'.repeat(36)}\nINGREDIENTS\n`;
+  recipe.ingredients.forEach(ing=>{
+    const g=Math.round(ing.grams*scale*10)/10;
+    t+=`  ${fmtG(g)}${ing.isCount?'':'g'}  —  ${ing.name}`;
+    if(ing.note) t+=` (${ing.note})`;
+    t+='\n';
+  });
+  if(recipe.instructions?.length){t+='\nMETHOD\n';recipe.instructions.forEach((s,i)=>t+=`  ${i+1}. ${s}\n`);}
+  const key=noteKey();
+  const myNotes=key&&notes[key];
+  if(myNotes?.length){t+='\nNOTES\n';myNotes.forEach(n=>t+=`  [${n.date} ${n.time}] ${n.text}\n`);}
+  t+=`\n${rcfg.measureLine}\nSources: ${(recipe.sourcesUsed||rcfg.srcDefaultLabels).join(', ')}`;
+  navigator.clipboard.writeText(t).then(()=>showToast('✓ Copied to clipboard'));
+}
+
+// ── Save ──
+function saveRecipe(){
+  if(!recipe) return;
+  const already=saved.find(r=>r.title===recipe.title&&r.servings===recipe.servings);
+  if(already){showToast('Already saved!');return;}
+  saved.unshift({...recipe, savedAt:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})});
+  if(saved.length>30) saved.pop();
+  localStorage.setItem('cc_saved',JSON.stringify(saved));
+  updateBadge();
+  showToast('✓ Recipe saved');
+  if(navigator.vibrate) navigator.vibrate([15,15,35]);
+}
+function updateBadge(){
+  const b=document.getElementById('savedBadge');
+  if(saved.length>0){b.textContent=saved.length>9?'9+':saved.length;b.classList.add('on');}
+  else b.classList.remove('on');
+}
+
+// ── Saved Screen ──
+function renderSaved(){
+  const el=document.getElementById('savedContent'); el.innerHTML='';
+  if(!saved.length){
+    el.innerHTML=`<div class="saved-empty">
+      <div class="saved-empty-icon"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+      <h3>No saved recipes</h3>
+      <p>Scan a recipe and tap Save to store it here, along with all your notes.</p>
+    </div>`;
+    return;
+  }
+  saved.forEach((r,i)=>{
+    const key=(r.title||'unnamed').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    const noteCount=(notes[key]||[]).length;
+    const rFlag = r._region==='US' ? '🇺🇸' : '🇦🇺';
+    const rLabel = r._region==='US' ? 'US' : 'AUS';
+    const d=document.createElement('div'); d.className='saved-item';
+    d.innerHTML=`
+      <button class="saved-item-del" onclick="event.stopPropagation();deleteSaved(${i})">✕</button>
+      <div class="saved-item-name">${r.title}</div>
+      <div class="saved-item-meta">
+        <span class="s-chip" style="font-size:0.72rem">${rFlag}</span>
+        <span class="s-chip">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          ${r.savedAt}
+        </span>
+        <span class="s-chip">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+          </svg>
+          ${(r.ingredients||[]).length} ingredients
+        </span>
+        ${r.servings?`<span class="s-chip">${r.servings}</span>`:''}
+        ${noteCount>0?`<span class="s-chip note-chip">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          ${noteCount} note${noteCount>1?'s':''}
+        </span>`:''}
+      </div>
+    `;
+    d.onclick=()=>{
+      recipe=r; scale=1;
+      renderRecipe(); enableResultTab(); showScreen('result');
+    };
+    el.appendChild(d);
+  });
+  const cb=document.createElement('button'); cb.className='saved-clear-btn';
+  cb.textContent='Clear all saved recipes';
+  cb.onclick=()=>{if(confirm('Clear all saved recipes and notes?')){saved=[];localStorage.removeItem('cc_saved');localStorage.removeItem('cc_notes');notes={};updateBadge();renderSaved();}};
+  el.appendChild(cb);
+}
+function deleteSaved(i){
+  saved.splice(i,1);
+  localStorage.setItem('cc_saved',JSON.stringify(saved));
+  updateBadge(); renderSaved();
+  showToast('Removed');
+}
+
+// ── Toast / Error ──
+let toastTimer;
+function showToast(msg){
+  const el=document.getElementById('toast'); el.textContent=msg;
+  el.classList.add('on'); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('on'),2200);
+}
+function showErr(msg){
+  const el=document.getElementById('errCard');
+  document.getElementById('errText').textContent=msg;
+  el.classList.add('on');
+}
+function hideErr(){document.getElementById('errCard').classList.remove('on');}
+
+// ── Init ──
+updateBadge();
+// Restore saved region preference
+setRegion(region);
+</script>
+</body>
+</html>
